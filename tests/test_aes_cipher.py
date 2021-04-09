@@ -22,7 +22,7 @@
 # Imports
 import os, unittest
 from pathlib import Path
-from aes_cipher import FileDecrypter, FileEncrypter, FileDataEncodings, FileHmacError
+from aes_cipher import FileDecrypter, FileEncrypter, FileDataEncodings, FileHmacError, KeyIvGeneratorItrError
 from aes_cipher.file_decrypter import FileDecrypterConst
 
 #
@@ -36,6 +36,8 @@ TEST_ENC_FILE = TEST_FILES_PATH / "enc"
 TEST_SINGLE_PWD = "test_pwd"
 TEST_MULTIPLE_PWD = [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ]
 TEST_SALT = "test_salt"
+# For speeding up tests
+TEST_ITR = 1024 * 16
 
 #
 # Helper class for testing
@@ -43,23 +45,23 @@ TEST_SALT = "test_salt"
 class TestHelper:
     # Decrypt file (binary output)
     @staticmethod
-    def decrypt_file_bin(file_in, file_out, passwords, salt = None):
-        TestHelper.__decrypt_file(file_in, file_out, passwords, salt, FileDataEncodings.BINARY)
+    def decrypt_file_bin(file_in, file_out, passwords, salt = None, itr_num = TEST_ITR):
+        TestHelper.__decrypt_file(file_in, file_out, passwords, salt, itr_num, FileDataEncodings.BINARY)
 
     # Decrypt file (base64 output)
     @staticmethod
-    def decrypt_file_b64(file_in, file_out, passwords, salt = None):
-        TestHelper.__decrypt_file(file_in, file_out, passwords, salt, FileDataEncodings.BASE64)
+    def decrypt_file_b64(file_in, file_out, passwords, salt = None, itr_num = TEST_ITR):
+        TestHelper.__decrypt_file(file_in, file_out, passwords, salt, itr_num, FileDataEncodings.BASE64)
 
     # Encrypt file (binary output)
     @staticmethod
-    def encrypt_file_bin(file_in, file_out, passwords, salt = None):
-        TestHelper.__encrypt_file(file_in, file_out, passwords, salt, FileDataEncodings.BINARY)
+    def encrypt_file_bin(file_in, file_out, passwords, salt = None, itr_num = TEST_ITR):
+        TestHelper.__encrypt_file(file_in, file_out, passwords, salt, itr_num, FileDataEncodings.BINARY)
 
     # Encrypt file (base64 output)
     @staticmethod
-    def encrypt_file_b64(file_in, file_out, passwords, salt = None):
-        TestHelper.__encrypt_file(file_in, file_out, passwords, salt, FileDataEncodings.BASE64)
+    def encrypt_file_b64(file_in, file_out, passwords, salt = None, itr_num = TEST_ITR):
+        TestHelper.__encrypt_file(file_in, file_out, passwords, salt, itr_num, FileDataEncodings.BASE64)
 
     # Compare files
     @staticmethod
@@ -90,16 +92,16 @@ class TestHelper:
 
     # Decrypt file
     @staticmethod
-    def __decrypt_file(file_in, file_out, passwords, salt, enc):
+    def __decrypt_file(file_in, file_out, passwords, salt, itr_num, enc):
         file_decrypter = FileDecrypter()
-        file_decrypter.Decrypt(file_in, passwords, salt)
+        file_decrypter.Decrypt(file_in, passwords, salt, itr_num)
         file_decrypter.SaveTo(file_out)
 
     # Encrypt file
     @staticmethod
-    def __encrypt_file(file_in, file_out, passwords, salt, enc):
+    def __encrypt_file(file_in, file_out, passwords, salt, itr_num, enc):
         file_encrypter = FileEncrypter()
-        file_encrypter.Encrypt(file_in, passwords, salt)
+        file_encrypter.Encrypt(file_in, passwords, salt, itr_num)
         file_encrypter.SaveTo(file_out, enc)
 
 
@@ -119,6 +121,17 @@ class CipherTests(unittest.TestCase):
         TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD)
         TestHelper.corrupt_file(TEST_ENC_FILE, FileDecrypterConst.INT_KEY_OFF)
         self.assertRaises(FileHmacError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD)
+
+    # Test HMAC error for data
+    def test_data_hmac_error(self):
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD)
+        TestHelper.corrupt_file(TEST_ENC_FILE, FileDecrypterConst.DATA_ENC_OFF)
+        self.assertRaises(FileHmacError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD)
+
+    # Test iteration number error
+    def test_itrnum_error(self):
+        self.assertRaises(ValueError, TestHelper.encrypt_file_bin, TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD, TEST_SALT, 0)
+        self.assertRaises(ValueError, TestHelper.encrypt_file_bin, TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD, TEST_SALT, -1)
 
     # Test HMAC error for data
     def test_data_hmac_error(self):

@@ -22,7 +22,7 @@
 # Imports
 import os, unittest
 from pathlib import Path
-from aes_cipher import FileDecrypter, FileEncrypter, FileDataEncodings, FileHmacError, KeyIvGeneratorItrError
+from aes_cipher import FileDecrypter, FileEncrypter, FileDataEncodings, FileHmacError
 from aes_cipher.file_decrypter import FileDecrypterConst
 
 #

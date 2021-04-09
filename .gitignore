@@ -2,6 +2,8 @@
 *.pyc
 *.pyo
 __pycache__
+.coverage
+htmlcov
 *.egg-info
 build
 dist

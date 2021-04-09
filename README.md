@@ -43,27 +43,27 @@ To run the tests:
 *FileEncrypter* class:
 
 - **FileEncrypter.Encrypt(file_in, passwords [, salt, itr_num])**
-    - file_in: input file
-    - passwords: single password (string) or multiple passwords (array of passwords)
-    - salt: custom salt. If not specified, the default salt "[]=?AeS_CiPhEr><()" will be used.
-    - itr_num: number of iterations for PBKDF2-SHA512 algorithm. If not specified, the default value of 524288 (1024 * 512) will be used.
+    - *file_in*: input file
+    - *passwords*: single password (string) or multiple passwords (array of passwords)
+    - *salt*: custom salt. If not specified, the default salt "[]=?AeS_CiPhEr><()" will be used.
+    - *itr_num*: number of iterations for PBKDF2-SHA512 algorithm. If not specified, the default value of 524288 (1024 * 512) will be used.
 - **FileEncrypter.GetEncryptedData(data_encoding)**
-    - data_encoding: *FileDataEncodings.BINARY* for binary file, *FileDataEncodings.BASE64* for base64
+    - *data_encoding*: *FileDataEncodings.BINARY* for binary file, *FileDataEncodings.BASE64* for base64
 - **FileEncrypter.SaveTo(file_out [, data_encoding])**
-    - file_out: output file to be saved
-    - data_encoding: *FileDataEncodings.BINARY* for binary file (default value), *FileDataEncodings.BASE64* for base64
+    - *file_out*: output file to be saved
+    - *data_encoding*: *FileDataEncodings.BINARY* for binary file (default value), *FileDataEncodings.BASE64* for base64
 
 *FileDecrypter* class:
 
 - **FileDecrypter.Decrypt(file_in, passwords [, salt, itr_num])**
-    - file_in: input file
-    - passwords: single password (string) or multiple passwords (array of passwords)
-    - salt: custom salt. If not specified the default salt "[]=?AeS_CiPhEr><()" will be used.
-    - itr_num: number of iterations for PBKDF2-SHA512 algorithm. If not specified, the default value of 524288 (1024 * 512) will be used.
+    - *file_in*: input file
+    - *passwords*: single password (string) or multiple passwords (array of passwords)
+    - *salt*: custom salt. If not specified the default salt "[]=?AeS_CiPhEr><()" will be used.
+    - *itr_num*: number of iterations for PBKDF2-SHA512 algorithm. If not specified, the default value of 524288 (1024 * 512) will be used.
 - **FileDecrypter.GetDecryptedData(data_encoding)**
-    - data_encoding: *FileDataEncodings.BINARY* for binary file, *FileDataEncodings.BASE64* for base64
+    - *data_encoding*: *FileDataEncodings.BINARY* for binary file, *FileDataEncodings.BASE64* for base64
 - **FileDecrypter.SaveTo(file_out)**
-    - file_out: output file to be saved
+    - *file_out*: output file to be saved
 
 ## Examples
 

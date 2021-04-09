@@ -53,8 +53,11 @@ class KeyIvGenerator:
 
     # Generate master key and IV from password
     def GenerateMaster(self, password, salt, itr_num):
-        salt = KeyIvGeneratorConst.DEF_SALT if salt is None else salt
         itr_num = KeyIvGeneratorConst.ITR_NUM if itr_num is None else itr_num
+        if itr_num <= 0:
+            raise ValueError("Invalid iteration number")
+
+        salt = KeyIvGeneratorConst.DEF_SALT if salt is None else salt
         password = Utils.Encode(password)
 
         # Compute master key and IV from PBKDF2-SHA512

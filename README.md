@@ -1,4 +1,9 @@
 # AES Cipher
+[![Build Status](https://www.travis-ci.com/ebellocchia/aes_cipher.svg?branch=main)](https://travis-ci.com/ebellocchia/aes_cipher)
+[![codecov](https://codecov.io/gh/ebellocchia/aes_cipher/branch/main/graph/badge.svg)](https://codecov.io/gh/ebellocchia/aes_cipher)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/ebellocchia/bip_utils/master/LICENSE)
+
+## Introduction
 
 AES cipher is a simple application to encrypt/decrypt files using AES256-CBC.
 
@@ -8,7 +13,7 @@ It is possible to specify a single password or a list of passwords, in this case
 
 *pycryptodome* is used as crypto library.
 
-# Installation
+## Installation
 
 The package requires Python 3, it is not compatible with Python 2.
 To install it:
@@ -32,7 +37,7 @@ To run the tests:
         coverage run -m unittest discover
         coverage report
 
-# APIs
+## APIs
 
 *FileEncrypter* class:
 
@@ -59,7 +64,7 @@ To run the tests:
 - **FileDecrypter.SaveTo(file_out)**
     - file_out: output file to be saved
 
-# Examples
+## Examples
 
 Basic encryption with single password and default salt. The output is a binary file.
 

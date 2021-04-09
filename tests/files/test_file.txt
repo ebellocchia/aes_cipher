@@ -1,0 +1,4 @@
+Hello,
+This a test file for encrypting/decrypting a text file.
+
+Thank you!

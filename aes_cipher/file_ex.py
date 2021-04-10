@@ -26,7 +26,10 @@
 class FileEncodingError(Exception):
     pass
 
-
 # File HMAC error
 class FileHmacError(Exception):
+    pass
+
+# File decrypt error
+class FileDecryptError(Exception):
     pass

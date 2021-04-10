@@ -24,7 +24,7 @@
 import binascii
 from aes_cipher.aes_const import AesConst
 from aes_cipher.aes_cbc_decrypter import AesCbcDecrypter
-from aes_cipher.file_ex import FileHmacError
+from aes_cipher.file_ex import FileDecryptError, FileHmacError
 from aes_cipher.file_data_encodings import FileDataEncodings, FileDataEncoder
 from aes_cipher.key_iv_generator import KeyIvGenerator
 from aes_cipher.hmac_sha256 import HmacSha256
@@ -70,10 +70,13 @@ class FileDecrypter:
             key_iv_gen = KeyIvGenerator()
             key_iv_gen.GenerateMaster(password, salt, itr_num)
 
-            # Read internal key and IV
-            internal_key, internal_iv = self.__ReadInternalKeyIv(curr_data, key_iv_gen)
-            # Read data
-            curr_data = self.__ReadData(curr_data, internal_key, internal_iv)
+            try:
+                # Read internal key and IV
+                internal_key, internal_iv = self.__ReadInternalKeyIv(curr_data, key_iv_gen)
+                # Read data
+                curr_data = self.__ReadData(curr_data, internal_key, internal_iv)
+            except ValueError as ex:
+                raise FileDecryptError("Unable to decrypt file") from ex
 
         self.decrypted_data = curr_data
 

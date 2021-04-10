@@ -22,7 +22,7 @@
 # Imports
 import os, unittest
 from pathlib import Path
-from aes_cipher import FileDecrypter, FileEncrypter, FileDataEncodings, FileHmacError
+from aes_cipher import FileDecrypter, FileEncrypter, FileDataEncodings, FileHmacError, FileDecryptError
 from aes_cipher.file_decrypter import FileDecrypterConst
 
 #
@@ -144,17 +144,17 @@ class CipherTests(unittest.TestCase):
     # Test error when decrypting with wrong password
     def test_wrong_password(self):
         TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
-        self.assertRaises(ValueError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_2)
+        self.assertRaises(FileDecryptError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_2)
 
     # Test error when decrypting with wrong salt
     def test_wrong_salt(self):
         TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
-        self.assertRaises(ValueError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_2, TEST_SALT_2)
+        self.assertRaises(FileDecryptError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_2, TEST_SALT_2)
 
     # Test error when decrypting with wrong iteration number
     def test_wrong_itr_num(self):
         TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1, TEST_ITR)
-        self.assertRaises(ValueError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_2, TEST_SALT_2, TEST_ITR - 1)
+        self.assertRaises(FileDecryptError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_2, TEST_SALT_2, TEST_ITR - 1)
 
     # Test encryption/decryption with single password and default salt (text file as input)
     def test_txt_single_pwd_def_salt(self):

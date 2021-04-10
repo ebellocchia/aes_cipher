@@ -33,9 +33,11 @@ TEST_TXT_FILE = TEST_FILES_PATH / "test_file.txt"
 TEST_ZIP_FILE = TEST_FILES_PATH / "test_file.zip"
 TEST_DEC_FILE = TEST_FILES_PATH / "dec"
 TEST_ENC_FILE = TEST_FILES_PATH / "enc"
-TEST_SINGLE_PWD = "test_pwd"
+TEST_SINGLE_PWD_1 = "test_pwd_1"
+TEST_SINGLE_PWD_2 = "test_pwd_2"
 TEST_MULTIPLE_PWD = [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ]
-TEST_SALT = "test_salt"
+TEST_SALT_1 = "test_salt_1"
+TEST_SALT_2 = "test_salt_2"
 # For speeding up tests
 TEST_ITR = 1024 * 16
 
@@ -118,37 +120,52 @@ class CipherTests(unittest.TestCase):
 
     # Test HMAC error for key/IV
     def test_keyiv_hmac_error(self):
-        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD)
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
         TestHelper.corrupt_file(TEST_ENC_FILE, FileDecrypterConst.INT_KEY_OFF)
-        self.assertRaises(FileHmacError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD)
+        self.assertRaises(FileHmacError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
 
     # Test HMAC error for data
     def test_data_hmac_error(self):
-        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD)
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
         TestHelper.corrupt_file(TEST_ENC_FILE, FileDecrypterConst.DATA_ENC_OFF)
-        self.assertRaises(FileHmacError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD)
+        self.assertRaises(FileHmacError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
 
     # Test iteration number error
     def test_itrnum_error(self):
-        self.assertRaises(ValueError, TestHelper.encrypt_file_bin, TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD, TEST_SALT, 0)
-        self.assertRaises(ValueError, TestHelper.encrypt_file_bin, TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD, TEST_SALT, -1)
+        self.assertRaises(ValueError, TestHelper.encrypt_file_bin, TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1, 0)
+        self.assertRaises(ValueError, TestHelper.encrypt_file_bin, TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1, -1)
 
     # Test HMAC error for data
     def test_data_hmac_error(self):
-        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD)
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
         TestHelper.corrupt_file(TEST_ENC_FILE, FileDecrypterConst.DATA_ENC_OFF)
-        self.assertRaises(FileHmacError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD)
+        self.assertRaises(FileHmacError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
+
+    # Test error when decrypting with wrong password
+    def test_wrong_password(self):
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
+        self.assertRaises(ValueError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_2)
+
+    # Test error when decrypting with wrong salt
+    def test_wrong_salt(self):
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
+        self.assertRaises(ValueError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_2, TEST_SALT_2)
+
+    # Test error when decrypting with wrong iteration number
+    def test_wrong_itr_num(self):
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1, TEST_ITR)
+        self.assertRaises(ValueError, TestHelper.decrypt_file_bin, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_2, TEST_SALT_2, TEST_ITR - 1)
 
     # Test encryption/decryption with single password and default salt (text file as input)
     def test_txt_single_pwd_def_salt(self):
-        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD)
-        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD)
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
+        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
         TestHelper.compare_files(self, TEST_TXT_FILE, TEST_DEC_FILE)
 
     # Test encryption/decryption with single password and custom salt (text file as input)
     def test_txt_single_pwd_custom_salt(self):
-        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD, TEST_SALT)
-        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD, TEST_SALT)
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
+        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
         TestHelper.compare_files(self, TEST_TXT_FILE, TEST_DEC_FILE)
 
     # Test encryption/decryption with multiple passwords and default salt (text file as input)
@@ -159,20 +176,20 @@ class CipherTests(unittest.TestCase):
 
     # Test encryption/decryption with multiple passwords and custom salt (text file as input)
     def test_txt_multiple_pwd_custom_salt(self):
-        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_MULTIPLE_PWD, TEST_SALT)
-        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_MULTIPLE_PWD, TEST_SALT)
+        TestHelper.encrypt_file_bin(TEST_TXT_FILE, TEST_ENC_FILE, TEST_MULTIPLE_PWD, TEST_SALT_1)
+        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_MULTIPLE_PWD, TEST_SALT_1)
         TestHelper.compare_files(self, TEST_TXT_FILE, TEST_DEC_FILE)
 
     # Test encryption/decryption with single password and default salt (binary file as input)
     def test_bin_single_pwd_def_salt(self):
-        TestHelper.encrypt_file_bin(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD)
-        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD)
+        TestHelper.encrypt_file_bin(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
+        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
         TestHelper.compare_files(self, TEST_ZIP_FILE, TEST_DEC_FILE)
 
     # Test encryption/decryption with single password and custom salt (binary file as input)
     def test_bin_single_pwd_custom_salt(self):
-        TestHelper.encrypt_file_bin(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD, TEST_SALT)
-        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD, TEST_SALT)
+        TestHelper.encrypt_file_bin(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
+        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
         TestHelper.compare_files(self, TEST_ZIP_FILE, TEST_DEC_FILE)
 
     # Test encryption/decryption with multiple passwords and default salt (binary file as input)
@@ -183,12 +200,12 @@ class CipherTests(unittest.TestCase):
 
     # Test encryption/decryption with multiple passwords and custom salt (binary file as input)
     def test_bin_multiple_pwd_custom_salt(self):
-        TestHelper.encrypt_file_bin(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_MULTIPLE_PWD, TEST_SALT)
-        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_MULTIPLE_PWD, TEST_SALT)
+        TestHelper.encrypt_file_bin(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_MULTIPLE_PWD, TEST_SALT_1)
+        TestHelper.decrypt_file_bin(TEST_ENC_FILE, TEST_DEC_FILE, TEST_MULTIPLE_PWD, TEST_SALT_1)
         TestHelper.compare_files(self, TEST_ZIP_FILE, TEST_DEC_FILE)
 
     # Test using base64 as encryption output
     def test_base64(self):
-        TestHelper.encrypt_file_b64(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD)
-        TestHelper.decrypt_file_b64(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD)
+        TestHelper.encrypt_file_b64(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
+        TestHelper.decrypt_file_b64(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
         TestHelper.compare_files(self, TEST_TXT_FILE, TEST_DEC_FILE)

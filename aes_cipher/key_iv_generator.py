@@ -36,7 +36,7 @@ from aes_cipher.utils import Utils
 
 # Constants for Key and IV generator class
 class KeyIvGeneratorConst:
-    ITR_NUM = 524288
+    ITR_NUM = 1024 * 512
     DEF_SALT = b"[]=?AeS_CiPhEr><()"
     KEY_LEN = AesConst.BlockSize() * 2
     IV_LEN = AesConst.BlockSize()
@@ -67,7 +67,7 @@ class KeyIvGenerator:
 
     # Generate internal key and IV
     def GenerateInternal(self):
-        # Compute internal key and IV
+        # Generate random internal key and IV
         self.internal_key = os.urandom(KeyIvGeneratorConst.KEY_LEN)
         self.internal_iv = os.urandom(KeyIvGeneratorConst.IV_LEN)
 

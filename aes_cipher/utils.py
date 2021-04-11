@@ -19,12 +19,6 @@
 # THE SOFTWARE.
 
 #
-# Imports
-#
-import base64, binascii
-
-
-#
 # Classes
 #
 
@@ -49,24 +43,3 @@ class Utils:
             return data
         else:
             raise RuntimeError("Invalid data type")
-
-    # Base64 decode
-    @staticmethod
-    def Base64Decode(data):
-        return base64.b64decode(data)
-
-    # Base64 encode
-    @staticmethod
-    def Base64Encode(data):
-        return Utils.Decode(base64.b64encode(Utils.Encode(data)))
-
-    # Check if base64
-    @staticmethod
-    def IsBase64(data):
-        try:
-            base64.b64decode(data, validate=True)
-            res = True
-        except binascii.Error:
-            res = False
-
-        return res

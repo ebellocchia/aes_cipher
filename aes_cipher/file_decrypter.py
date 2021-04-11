@@ -21,126 +21,33 @@
 #
 # Imports
 #
-import binascii
-from aes_cipher.aes_const import AesConst
-from aes_cipher.aes_cbc_decrypter import AesCbcDecrypter
-from aes_cipher.file_ex import FileDecryptError, FileHmacError
-from aes_cipher.file_data_encodings import FileDataEncodings, FileDataEncoder
-from aes_cipher.key_iv_generator import KeyIvGenerator
-from aes_cipher.hmac_sha256 import HmacSha256
+from aes_cipher.data_decrypter import DataDecrypter
+from aes_cipher.file_reader import FileReader
+from aes_cipher.file_writer import FileWriter
 from aes_cipher.logger import Logger
-from aes_cipher.utils import Utils
 
 
 #
 # Classes
 #
 
-# Constants for file decrypter
-class FileDecrypterConst:
-    INT_KEY_OFF = 0
-    INT_IV_OFF = AesConst.KeySize()
-    INT_KEY_IV_PAD_OFF = AesConst.KeySize() + AesConst.IvSize()
-    INT_KEY_IV_DIG_OFF = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize()
-    DATA_ENC_OFF = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize() + HmacSha256.DigestSize()
-    DATA_DIG_OFF = -1 * HmacSha256.DigestSize()
-
-
 # File decrypter class
 class FileDecrypter:
     # Constructor
     def __init__(self, logger = Logger()):
-        self.decrypted_data = ""
-        self.logger = logger
+        self.decrypter = DataDecrypter(logger)
 
     # Decrypt
     def Decrypt(self, file_in, passwords, salt = None, itr_num = None):
         # Read file
-        curr_data = self.__ReadFile(file_in)
-        # Log
-        self.logger.GetLogger().info("Salt: %s" % salt)
+        file_data = FileReader.Read(file_in)
+        # Decrypt it
+        self.decrypter.Decrypt(file_data, passwords, salt, itr_num)
 
-        # Decrypt multiple times, one for each given password in reverse order
-        for password in reversed(passwords):
-            # Log
-            self.logger.GetLogger().info("Decrypting with password: %s" % password)
-            self.logger.GetLogger().info("  Current data: %s" % binascii.hexlify(Utils.Encode(curr_data)))
-
-            # Generate keys and IVs
-            key_iv_gen = KeyIvGenerator()
-            key_iv_gen.GenerateMaster(password, salt, itr_num)
-
-            try:
-                # Read internal key and IV
-                internal_key, internal_iv = self.__ReadInternalKeyIv(curr_data, key_iv_gen)
-                # Read data
-                curr_data = self.__ReadData(curr_data, internal_key, internal_iv)
-            except ValueError as ex:
-                raise FileDecryptError("Unable to decrypt file") from ex
-
-        self.decrypted_data = curr_data
+    # Get decrypted data
+    def GetDecryptedData(self):
+        return self.decrypter.GetDecryptedData()
 
     # Save to file
     def SaveTo(self, file_out):
-        with open(file_out, "wb") as fout:
-            fout.write(self.GetDecryptedData(FileDataEncodings.BINARY))
-
-    # Get decrypted data
-    def GetDecryptedData(self, data_encoding):
-        return FileDataEncoder.EncodeData(self.decrypted_data, data_encoding)
-
-    # Read internal key and IV
-    def __ReadInternalKeyIv(self, data, key_iv_gen):
-        # Get encrypted bytes and digest
-        key_iv_encrypted = data[FileDecrypterConst.INT_KEY_OFF : FileDecrypterConst.INT_KEY_IV_DIG_OFF]
-        key_iv_digest = data[FileDecrypterConst.INT_KEY_IV_DIG_OFF : FileDecrypterConst.DATA_ENC_OFF]
-
-        # Log
-        self.logger.GetLogger().info("  Encrypted internal key/IV: %s" % binascii.hexlify(key_iv_encrypted))
-        self.logger.GetLogger().info("  Internal key/IV digest: %s" % binascii.hexlify(key_iv_digest))
-
-        # Decrypt internal key and IV with master key and IV
-        aes_decrypter = AesCbcDecrypter(key_iv_gen.GetMasterKey(), key_iv_gen.GetMasterIV())
-        aes_decrypter.Decrypt(key_iv_encrypted)
-        key_iv_decrypted = aes_decrypter.GetDecryptedData()
-        # Verify their digest
-        if not HmacSha256.QuickVerify(key_iv_gen.GetMasterKey(), key_iv_decrypted, key_iv_digest):
-            raise FileHmacError("Invalid HMAC for internal key and IV")
-
-        return key_iv_decrypted[FileDecrypterConst.INT_KEY_OFF : FileDecrypterConst.INT_IV_OFF], key_iv_decrypted[FileDecrypterConst.INT_IV_OFF : FileDecrypterConst.INT_KEY_IV_PAD_OFF]
-
-    # Read data
-    def __ReadData(self, data, internal_key, internal_iv):
-        # Get encrypted bytes and digest
-        data_encrypted = data[FileDecrypterConst.DATA_ENC_OFF : FileDecrypterConst.DATA_DIG_OFF]
-        data_digest = data[FileDecrypterConst.DATA_DIG_OFF:]
-
-        # Log
-        self.logger.GetLogger().info("  Encrypted data: %s" % binascii.hexlify(data_encrypted))
-        self.logger.GetLogger().info("  Data digest: %s" % binascii.hexlify(data_digest))
-
-        # Decrypt data with internal key and IV
-        aes_decrypter = AesCbcDecrypter(internal_key, internal_iv)
-        aes_decrypter.Decrypt(data_encrypted)
-        data_decrypted = aes_decrypter.GetDecryptedData()
-        # Verify its digest
-        if not HmacSha256.QuickVerify(internal_key, data_decrypted, data_digest):
-            raise FileHmacError("Invalid HMAC for data")
-
-        # Log
-        self.logger.GetLogger().info("  Decrypted data: %s" % binascii.hexlify(data_decrypted))
-
-        return data_decrypted
-
-    # Read file and get content
-    @staticmethod
-    def __ReadFile(file_in):
-        # Read file
-        with open(file_in, "rb") as fin:
-            file_data = fin.read()
-
-        # Decode if necessary
-        if Utils.IsBase64(file_data):
-            file_data = Utils.Base64Decode(file_data)
-
-        return file_data
+        FileWriter.Write(file_out, self.GetDecryptedData())

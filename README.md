@@ -6,7 +6,7 @@
 
 ## Introduction
 
-AES cipher is a simple application to encrypt/decrypt files using AES256-CBC.
+AES cipher is a simple application to encrypt/decrypt using AES256-CBC. It is possible to encrypt/decrypt both files and data (string or bytes).
 
 A master key and IV are derived from the given password and salt using PBKDF2-SHA512. Then a random key and IV are generated and used to encrypt the actual data (in this way, if the same file is encrypted with the same password multiple times, the encrypted file will always be different). Finally, these random key and IV are encrypted with the master key and IV.
 
@@ -40,67 +40,88 @@ To run the tests:
 
 ## APIs
 
-*FileEncrypter* class:
+*DataEncrypter* class:
 
-- **FileEncrypter.Encrypt(file_in, passwords [, salt, itr_num])**
-    - *file_in*: input file
-    - *passwords*: single password (string) or multiple passwords (array of passwords)
+- **DataEncrypter.Encrypt(data, passwords [, salt, itr_num])**: encrypt data with the specified passwords, salt and iteration number
+    - *data*: input data (string or bytes)
+    - *passwords*: single password (string) or multiple passwords (array of strings)
     - *salt*: custom salt. If not specified, the default salt "[]=?AeS_CiPhEr><()" will be used.
     - *itr_num*: number of iterations for PBKDF2-SHA512 algorithm. If not specified, the default value of 524288 (1024 * 512) will be used.
-- **FileEncrypter.GetEncryptedData(data_encoding)**
-    - *data_encoding*: *FileDataEncodings.BINARY* for binary file, *FileDataEncodings.BASE64* for base64
-- **FileEncrypter.SaveTo(file_out [, data_encoding])**
+- **DataEncrypter.GetEncryptedData()**: get encrypted data (bytes)
+
+*FileEncrypter* class: encrypt file
+
+- **FileEncrypter.Encrypt(file_in, passwords [, salt, itr_num])**: encrypt file with the specified passwords, salt and iteration number
+    - *file_in*: input file
+    - *passwords*: see *DataEncrypter.Encrypt*
+    - *salt*: see *DataEncrypter.Encrypt*
+    - *itr_num*: see *DataEncrypter.Encrypt*
+- **FileEncrypter.GetEncryptedData()**: get encrypted data (bytes)
+- **FileEncrypter.SaveTo(file_out)**: save to file
     - *file_out*: output file to be saved
-    - *data_encoding*: *FileDataEncodings.BINARY* for binary file (default value), *FileDataEncodings.BASE64* for base64
+
+*DataDecrypter* class:
+
+- **DataDecrypter.Decrypt(data, passwords [, salt, itr_num])**: decrypt data with the specified passwords, salt and iteration number
+    - *data*: input data (string or bytes)
+    - *passwords*: see *DataEncrypter.Encrypt*
+    - *salt*: see *DataEncrypter.Encrypt*
+    - *itr_num*: see *DataEncrypter.Encrypt*
+- **DataDecrypter.GetDecryptedData()**: get decrypted data (bytes)
 
 *FileDecrypter* class:
 
 - **FileDecrypter.Decrypt(file_in, passwords [, salt, itr_num])**
     - *file_in*: input file
-    - *passwords*: single password (string) or multiple passwords (array of passwords)
-    - *salt*: custom salt. If not specified the default salt "[]=?AeS_CiPhEr><()" will be used.
-    - *itr_num*: number of iterations for PBKDF2-SHA512 algorithm. If not specified, the default value of 524288 (1024 * 512) will be used.
-- **FileDecrypter.GetDecryptedData(data_encoding)**
-    - *data_encoding*: *FileDataEncodings.BINARY* for binary file, *FileDataEncodings.BASE64* for base64
-- **FileDecrypter.SaveTo(file_out)**
+    - *passwords*: see *DataDecrypter.Decrypt*
+    - *salt*: see *DataDecrypter.Decrypt*
+    - *itr_num*: see *DataDecrypter.Decrypt*
+- **FileDecrypter.GetDecryptedData()**: get decrypted data (bytes)
+- **FileDecrypter.SaveTo(file_out)**: save to file
     - *file_out*: output file to be saved
 
 ## Examples
 
-Basic encryption with single password and default salt. The output is a binary file.
+Data encryption with single password and default salt:
+
+    data_encrypter = DataEncrypter()
+    data_encrypter.Encrypt(data, "test_pwd")
+    enc_data = data_encrypter.GetEncryptedData()
+
+Data encryption with single password and custom salt:
+
+    data_encrypter = DataEncrypter()
+    data_encrypter.Encrypt(data, "test_pwd", "test_salt")
+    enc_data = data_encrypter.GetEncryptedData()
+
+Data encryption with multiple passwords, default salt and custom number of iterations:
+
+    data_encrypter = DataEncrypter()
+    data_encrypter.Encrypt(data, [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ], itr_num=1048576)
+    enc_data = data_encrypter.GetEncryptedData()
+
+Data decryption with single password and default salt:
+
+    data_decrypter = DataDecrypter()
+    data_decrypter.Decrypt(data, "test_pwd")
+    dec_data = data_decrypter.GetDecryptedData()
+
+Data decryption with multiple password and custom salt:
+
+    data_decrypter = DataDecrypter()
+    data_decrypter.Decrypt(data, [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ], "test_salt")
+    dec_data = data_decrypter.GetDecryptedData()
+
+File encryption with single password and default salt:
 
     file_encrypter = FileEncrypter()
     file_encrypter.Encrypt(file_in, "test_pwd")
     file_encrypter.SaveTo(file_out)
-
-Basic encryption with single password and custom salt (output is in base64 format):
-
-    file_encrypter = FileEncrypter()
-    file_encrypter.Encrypt(file_in, "test_pwd", "test_salt")
-    file_encrypter.SaveTo(file_out, FileDataEncodings.BASE64)
-
-Basic encryption with multiple passwords, default salt and custom number of iterations:
-
-    file_encrypter = FileEncrypter()
-    file_encrypter.Encrypt(file_in, [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ], itr_num=1048576)
-    file_encrypter.SaveTo(file_out)
-
-Basic decryption with single password and default salt:
-
-    file_decrypter = FileDecrypter()
-    file_decrypter.Decrypt(file_in, "test_pwd")
-    file_decrypter.SaveTo(file_out)
-
-Basic decryption with multiple password and custom salt:
-
-    file_decrypter = FileDecrypter()
-    file_decrypter.Decrypt(file_in, [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ], "test_salt")
-    file_decrypter.SaveTo(file_out)
 
 Enable verbose mode:
 
     logger = Logger()
     logger.SetVerbose(True)
 
-    file_encrypter = FileEncrypter(logger)
-    file_encrypter = FileDecrypter(logger)
+    data_encrypter = DataEncrypter(logger)
+    data_encrypter = DataDecrypter(logger)

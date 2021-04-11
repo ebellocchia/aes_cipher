@@ -38,8 +38,6 @@ from aes_cipher.utils import Utils
 class KeyIvGeneratorConst:
     ITR_NUM = 1024 * 512
     DEF_SALT = b"[]=?AeS_CiPhEr><()"
-    KEY_LEN = AesConst.BlockSize() * 2
-    IV_LEN = AesConst.BlockSize()
 
 
 # Key and IV generator class
@@ -62,14 +60,14 @@ class KeyIvGenerator:
 
         # Compute master key and IV from PBKDF2-SHA512
         kdf = Pbkdf2Sha512.Compute(password, salt, itr_num)
-        self.master_key = kdf[:KeyIvGeneratorConst.KEY_LEN]
-        self.master_iv = kdf[KeyIvGeneratorConst.KEY_LEN:KeyIvGeneratorConst.KEY_LEN + KeyIvGeneratorConst.IV_LEN]
+        self.master_key = kdf[:AesConst.KeySize()]
+        self.master_iv = kdf[AesConst.KeySize() : AesConst.KeySize() + AesConst.IvSize()]
 
     # Generate internal key and IV
     def GenerateInternal(self):
         # Generate random internal key and IV
-        self.internal_key = os.urandom(KeyIvGeneratorConst.KEY_LEN)
-        self.internal_iv = os.urandom(KeyIvGeneratorConst.IV_LEN)
+        self.internal_key = os.urandom(AesConst.KeySize())
+        self.internal_iv = os.urandom(AesConst.IvSize())
 
     # Get master key
     def GetMasterKey(self):

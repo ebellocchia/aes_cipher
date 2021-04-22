@@ -110,8 +110,8 @@ class DataDecrypter:
         if not HmacSha256.QuickVerify(key_iv_gen.GetMasterKey(), key_iv_decrypted, key_iv_digest):
             raise DataHmacError("Invalid HMAC for internal key and IV")
 
-        return key_iv_decrypted[DataDecrypterConst.INT_KEY_OFF: DataDecrypterConst.INT_IV_OFF],\
-               key_iv_decrypted[DataDecrypterConst.INT_IV_OFF: DataDecrypterConst.INT_KEY_IV_PAD_OFF]
+        return (key_iv_decrypted[DataDecrypterConst.INT_KEY_OFF: DataDecrypterConst.INT_IV_OFF],
+                key_iv_decrypted[DataDecrypterConst.INT_IV_OFF: DataDecrypterConst.INT_KEY_IV_PAD_OFF])
 
     # Read data
     def __ReadData(self,

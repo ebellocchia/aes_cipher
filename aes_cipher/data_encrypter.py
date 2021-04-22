@@ -98,7 +98,8 @@ class DataEncrypter:
         aes_encrypter.Encrypt(key_iv_gen.GetInternalKey() + key_iv_gen.GetInternalIV())
         key_iv_encrypted = aes_encrypter.GetEncryptedData()
         # Compute their digest
-        key_iv_digest = HmacSha256.QuickDigest(key_iv_gen.GetMasterKey(), key_iv_gen.GetInternalKey() + key_iv_gen.GetInternalIV())
+        key_iv_digest = HmacSha256.QuickDigest(key_iv_gen.GetMasterKey(),
+                                               key_iv_gen.GetInternalKey() + key_iv_gen.GetInternalIV())
 
         # Log
         self.logger.GetLogger().info("  Encrypted internal key/IV: %s" % binascii.hexlify(key_iv_encrypted))

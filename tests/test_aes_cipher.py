@@ -42,8 +42,8 @@ TEST_ENC_FILE = TEST_FILES_PATH / "enc"
 # Passwords and salts
 TEST_SINGLE_PWD_1 = "test_pwd_1"
 TEST_SINGLE_PWD_2 = "test_pwd_2"
-TEST_MULTIPLE_PWD_1 = [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ]
-TEST_MULTIPLE_PWD_2 = [ "test_pwd_1", "test_pwd_4", "test_pwd_3" ]
+TEST_MULTIPLE_PWD_1 = ["test_pwd_1", "test_pwd_2", "test_pwd_3"]
+TEST_MULTIPLE_PWD_2 = ["test_pwd_1", "test_pwd_4", "test_pwd_3"]
 TEST_SALT_1 = "test_salt_1"
 TEST_SALT_2 = "test_salt_2"
 # Input data
@@ -54,6 +54,7 @@ Thank you!"""
 TEST_BIN = b"\x91\x11\xa4\xe5\xa7\x81\x1f\x14\x0b\xb3\x83\xad\x04\xdf\xba\x98\x18\xb2\xd5\x01\xf6\xf6\xeb\x0f\xc8\xe6\xa9\x18\xb5\xa1\x16\x1a\xe2\n\x03\xd0\xd7"
 # For speeding up tests
 TEST_ITR = 1024 * 16
+
 
 #
 # Helper class for testing
@@ -98,7 +99,7 @@ class TestHelper:
     @staticmethod
     def corrupt_file(file_in, idx):
         file_data = bytearray(FileReader.Read(file_in))
-        file_data[idx] = 0 if file_data[idx] != 0 else 1;
+        file_data[idx] = 0 if file_data[idx] != 0 else 1
         FileWriter.Write(file_in, file_data)
 
     # Corrupt data
@@ -106,12 +107,13 @@ class TestHelper:
     def corrupt_data(data, idx):
         if isinstance(data, bytes):
             data_tmp = bytearray(data)
-            data_tmp[idx] = 0 if data_tmp[idx] != 0 else 1;
+            data_tmp[idx] = 0 if data_tmp[idx] != 0 else 1
             data = bytes(data_tmp)
         elif isinstance(data, str):
-            data[idx] = "0" if data[idx] != "0" else "1";
+            data[idx] = "0" if data[idx] != "0" else "1"
 
         return data
+
 
 #
 # Tests

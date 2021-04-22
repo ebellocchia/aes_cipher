@@ -21,6 +21,7 @@
 #
 # Imports
 #
+from typing import List, Optional, Union
 from aes_cipher.data_encrypter import DataEncrypter
 from aes_cipher.file_reader import FileReader
 from aes_cipher.file_writer import FileWriter
@@ -34,20 +35,26 @@ from aes_cipher.logger import Logger
 # File encrypter class
 class FileEncrypter:
     # Constructor
-    def __init__(self, logger = Logger()):
+    def __init__(self,
+                 logger: Logger = Logger()) -> None:
         self.encrypter = DataEncrypter(logger)
 
     # Encrypt
-    def Encrypt(self, file_in, passwords, salt = None, itr_num = None):
+    def Encrypt(self,
+                file_in: str,
+                passwords: List[Union[str, bytes]],
+                salt: Optional[Union[str, bytes]] = None,
+                itr_num: Optional[int] = None) -> None:
         # Read file
         file_data = FileReader.Read(file_in)
         # Encrypt it
         self.encrypter.Encrypt(file_data, passwords, salt, itr_num)
 
     # Get encrypted data
-    def GetEncryptedData(self):
+    def GetEncryptedData(self) -> bytes:
         return self.encrypter.GetEncryptedData()
 
     # Save to file
-    def SaveTo(self, file_out):
+    def SaveTo(self,
+               file_out: str) -> None:
         FileWriter.Write(file_out, self.GetEncryptedData())

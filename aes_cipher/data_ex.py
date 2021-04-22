@@ -26,6 +26,7 @@
 class DataHmacError(Exception):
     pass
 
+
 # Data decrypt error
 class DataDecryptError(Exception):
     pass

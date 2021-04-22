@@ -21,6 +21,7 @@
 #
 # Imports
 #
+from typing import Union
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from aes_cipher.aes_const import AesConst
@@ -34,19 +35,22 @@ from aes_cipher.utils import Utils
 # AES-CBC decrypter class
 class AesCbcDecrypter:
     # Constructor
-    def __init__(self, key, iv):
+    def __init__(self,
+                 key: Union[str, bytes],
+                 iv: Union[str, bytes]) -> None:
         self.decrypted_data = ""
-        self.aes = AES.new(Utils.Encode(key), AES.MODE_CBC, iv=iv)
+        self.aes = AES.new(Utils.Encode(key), AES.MODE_CBC, iv=Utils.Encode(iv))
 
     # Decrypt data
-    def Decrypt(self, data):
+    def Decrypt(self,
+                data: bytes) -> None:
         self.decrypted_data = self.UnPad(self.aes.decrypt(data))
 
     # Get decrypted data
-    def GetDecryptedData(self):
+    def GetDecryptedData(self) -> bytes:
         return self.decrypted_data
 
     # Unpad data
     @staticmethod
-    def UnPad(data):
-        return unpad(Utils.Encode(data), AesConst.BlockSize())
+    def UnPad(data: bytes) -> bytes:
+        return unpad(data, AesConst.BlockSize())

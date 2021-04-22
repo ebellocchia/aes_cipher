@@ -32,20 +32,20 @@ from Crypto.Cipher import AES
 class AesConst:
     # Get block size
     @staticmethod
-    def BlockSize():
+    def BlockSize() -> int:
         return AES.block_size
 
     # Get pad size
     @staticmethod
-    def PadSize():
+    def PadSize() -> int:
         return AesConst.BlockSize()
 
     # Get key size
     @staticmethod
-    def KeySize():
+    def KeySize() -> int:
         return AesConst.BlockSize() * 2
 
     # Get IV size
     @staticmethod
-    def IvSize():
+    def IvSize() -> int:
         return AesConst.BlockSize()

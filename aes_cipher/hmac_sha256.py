@@ -21,6 +21,7 @@
 #
 # Imports
 #
+from typing import Union
 from Crypto.Hash import HMAC, SHA256
 from aes_cipher.utils import Utils
 
@@ -32,17 +33,20 @@ from aes_cipher.utils import Utils
 # HMAC-SHA256 class
 class HmacSha256:
     # Constructor
-    def __init__(self, key):
+    def __init__(self,
+                 key: Union[str, bytes]) -> None:
         self.hmac = HMAC.new(Utils.Encode(key), digestmod=SHA256)
 
     # Update HMAC
-    def Update(self, data):
+    def Update(self,
+               data: Union[str, bytes]) -> None:
         self.hmac.update(Utils.Encode(data))
 
     # Update HMAC
-    def Verify(self, hmac_tbv):
+    def Verify(self,
+               hmac_tbv: bytes) -> bool:
         try:
-            self.hmac.verify(Utils.Encode(hmac_tbv))
+            self.hmac.verify(hmac_tbv)
             res = True
         except ValueError:
             res = False
@@ -50,12 +54,13 @@ class HmacSha256:
         return res
 
     # Get digest
-    def GetDigest(self):
+    def GetDigest(self) -> bytes:
         return self.hmac.digest()
 
     # Quick compute HMAC digest
     @staticmethod
-    def QuickDigest(key, data):
+    def QuickDigest(key: Union[str, bytes],
+                    data: Union[str, bytes]) -> bytes:
         hmac = HmacSha256(key)
         hmac.Update(data)
 
@@ -63,12 +68,14 @@ class HmacSha256:
 
     # Quick verify HMAC digest
     @staticmethod
-    def QuickVerify(key, data, hmac_tbv):
+    def QuickVerify(key: Union[str, bytes],
+                    data: Union[str, bytes],
+                    hmac_tbv: bytes) -> bool:
         hmac = HmacSha256(key)
         hmac.Update(data)
         return hmac.Verify(hmac_tbv)
 
     # Get digest size
     @staticmethod
-    def DigestSize():
+    def DigestSize() -> int:
         return SHA256.digest_size

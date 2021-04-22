@@ -22,6 +22,7 @@
 # Imports
 #
 import os
+from typing import Union
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA512
 from Crypto.Protocol.KDF import PBKDF2
@@ -36,51 +37,55 @@ from aes_cipher.utils import Utils
 
 # Constants for Key and IV generator class
 class KeyIvGeneratorConst:
-    ITR_NUM = 1024 * 512
-    DEF_SALT = b"[]=?AeS_CiPhEr><()"
+    # Default iterations number
+    DEF_ITR_NUM: int = 1024 * 512
+    # Default salt
+    DEF_SALT: bytes = b"[]=?AeS_CiPhEr><()"
 
 
 # Key and IV generator class
 class KeyIvGenerator:
     # Constructor
-    def __init__(self):
+    def __init__(self) -> None:
         self.master_key = b""
         self.master_iv = b""
         self.internal_key = b""
         self.internal_iv = b""
 
     # Generate master key and IV from password
-    def GenerateMaster(self, password, salt, itr_num):
-        itr_num = KeyIvGeneratorConst.ITR_NUM if itr_num is None else itr_num
+    def GenerateMaster(self,
+                       password: Union[str, bytes],
+                       salt: Union[str, bytes],
+                       itr_num: int) -> None:
+        itr_num = KeyIvGeneratorConst.DEF_ITR_NUM if itr_num is None else itr_num
         if itr_num <= 0:
             raise ValueError("Invalid iteration number")
 
         salt = KeyIvGeneratorConst.DEF_SALT if salt is None else salt
-        password = Utils.Encode(password)
 
         # Compute master key and IV from PBKDF2-SHA512
         kdf = Pbkdf2Sha512.Compute(password, salt, itr_num)
         self.master_key = kdf[:AesConst.KeySize()]
-        self.master_iv = kdf[AesConst.KeySize() : AesConst.KeySize() + AesConst.IvSize()]
+        self.master_iv = kdf[AesConst.KeySize(): AesConst.KeySize() + AesConst.IvSize()]
 
     # Generate internal key and IV
-    def GenerateInternal(self):
+    def GenerateInternal(self) -> None:
         # Generate random internal key and IV
         self.internal_key = os.urandom(AesConst.KeySize())
         self.internal_iv = os.urandom(AesConst.IvSize())
 
     # Get master key
-    def GetMasterKey(self):
+    def GetMasterKey(self) -> bytes:
         return self.master_key
 
     # Get master IV
-    def GetMasterIV(self):
+    def GetMasterIV(self) -> bytes:
         return self.master_iv
 
     # Get internal key
-    def GetInternalKey(self):
+    def GetInternalKey(self) -> bytes:
         return self.internal_key
 
     # Get internal IV
-    def GetInternalIV(self):
+    def GetInternalIV(self) -> bytes:
         return self.internal_iv

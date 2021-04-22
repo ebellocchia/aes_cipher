@@ -21,7 +21,9 @@
 #
 # Imports
 #
-import binascii, io
+import binascii
+import io
+from typing import List, Optional, Tuple, Union
 from aes_cipher.aes_cbc_encrypter import AesCbcEncrypter
 from aes_cipher.key_iv_generator import KeyIvGenerator
 from aes_cipher.hmac_sha256 import HmacSha256
@@ -36,12 +38,17 @@ from aes_cipher.utils import Utils
 # Data encrypter class
 class DataEncrypter:
     # Constructor
-    def __init__(self, logger = Logger()):
+    def __init__(self,
+                 logger: Logger = Logger()) -> None:
         self.encrypted_data = b""
         self.logger = logger
 
     # Encrypt
-    def Encrypt(self, data, passwords, salt = None, itr_num = None):
+    def Encrypt(self,
+                data: Union[str, bytes],
+                passwords: List[Union[str, bytes]],
+                salt: Optional[Union[str, bytes]] = None,
+                itr_num: Optional[int] = None) -> None:
         # Log
         self.logger.GetLogger().info("Salt: %s" % salt)
 
@@ -80,11 +87,12 @@ class DataEncrypter:
         self.encrypted_data = curr_data
 
     # Get encrypted data
-    def GetEncryptedData(self):
+    def GetEncryptedData(self) -> bytes:
         return self.encrypted_data
 
     # Process internal key and IV
-    def __ProcessInternalKeyIv(self, key_iv_gen):
+    def __ProcessInternalKeyIv(self,
+                               key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
         # Encrypt internal key and IV with master key and IV
         aes_encrypter = AesCbcEncrypter(key_iv_gen.GetMasterKey(), key_iv_gen.GetMasterIV())
         aes_encrypter.Encrypt(key_iv_gen.GetInternalKey() + key_iv_gen.GetInternalIV())
@@ -99,7 +107,9 @@ class DataEncrypter:
         return key_iv_encrypted, key_iv_digest
 
     # Process data
-    def __ProcessData(self, data, key_iv_gen):
+    def __ProcessData(self,
+                      data: Union[str, bytes],
+                      key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
         # Encrypt data with internal key and IV
         aes_encrypter = AesCbcEncrypter(key_iv_gen.GetInternalKey(), key_iv_gen.GetInternalIV())
         aes_encrypter.Encrypt(data)

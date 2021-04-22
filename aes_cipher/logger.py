@@ -30,29 +30,33 @@ import logging
 
 # Constant for logger class
 class LoggerConst:
-    LOG_FORMAT = "  LOG %(levelname)s - %(message)s"
+    LOG_FORMAT: str = "  LOG %(levelname)s - %(message)s"
 
 
 # Logger class
 class Logger:
     # Constructor
-    def __init__(self, name = ""):
+    def __init__(self,
+                 name: str = "") -> None:
         self.__CreateLogger(name)
         self.__ConfigureLogger()
         self.SetVerbose(False)
 
     # Get logger
-    def GetLogger(self):
+    def GetLogger(self) -> logging.Logger:
         return self.logger
 
     # Set verbose
-    def SetVerbose(self, is_verbose):
+    def SetVerbose(self,
+                   is_verbose: bool) -> None:
         self.logger.setLevel(logging.INFO if is_verbose else logging.WARNING)
 
     # Create logger
-    def __CreateLogger(self, name):
+    def __CreateLogger(self,
+                       name: str) -> None:
         self.logger = logging.getLogger(name)
 
     # Configure logger
-    def __ConfigureLogger(self):
+    @staticmethod
+    def __ConfigureLogger() -> None:
         logging.basicConfig(format=LoggerConst.LOG_FORMAT)

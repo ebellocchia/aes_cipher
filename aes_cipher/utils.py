@@ -19,6 +19,12 @@
 # THE SOFTWARE.
 
 #
+# Imports
+#
+from typing import Union
+
+
+#
 # Classes
 #
 
@@ -26,7 +32,8 @@
 class Utils:
     # Decode data to specified encoding
     @staticmethod
-    def Decode(data, encoding = "utf-8"):
+    def Decode(data: Union[str, bytes],
+               encoding: str = "utf-8") -> str:
         if isinstance(data, str):
             return data
         elif isinstance(data, bytes):
@@ -36,7 +43,8 @@ class Utils:
 
     # Encode data to specified encoding
     @staticmethod
-    def Encode(data, encoding = "utf-8"):
+    def Encode(data: Union[str, bytes],
+               encoding: str = "utf-8") -> bytes:
         if isinstance(data, str):
             return data.encode(encoding)
         elif isinstance(data, bytes):

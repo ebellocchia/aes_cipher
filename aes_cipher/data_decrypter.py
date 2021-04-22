@@ -22,6 +22,7 @@
 # Imports
 #
 import binascii
+from typing import List, Optional, Tuple, Union
 from aes_cipher.aes_const import AesConst
 from aes_cipher.aes_cbc_decrypter import AesCbcDecrypter
 from aes_cipher.data_ex import DataDecryptError, DataHmacError
@@ -37,23 +38,28 @@ from aes_cipher.utils import Utils
 
 # Constants for file decrypter
 class DataDecrypterConst:
-    INT_KEY_OFF = 0
-    INT_IV_OFF = AesConst.KeySize()
-    INT_KEY_IV_PAD_OFF = AesConst.KeySize() + AesConst.IvSize()
-    INT_KEY_IV_DIG_OFF = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize()
-    DATA_ENC_OFF = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize() + HmacSha256.DigestSize()
-    DATA_DIG_OFF = -1 * HmacSha256.DigestSize()
+    INT_KEY_OFF: int = 0
+    INT_IV_OFF: int = AesConst.KeySize()
+    INT_KEY_IV_PAD_OFF: int = AesConst.KeySize() + AesConst.IvSize()
+    INT_KEY_IV_DIG_OFF: int = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize()
+    DATA_ENC_OFF: int = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize() + HmacSha256.DigestSize()
+    DATA_DIG_OFF: int = -1 * HmacSha256.DigestSize()
 
 
 # Data decrypter class
 class DataDecrypter:
     # Constructor
-    def __init__(self, logger = Logger()):
+    def __init__(self,
+                 logger: Logger = Logger()) -> None:
         self.decrypted_data = ""
         self.logger = logger
 
     # Decrypt
-    def Decrypt(self, data, passwords, salt = None, itr_num = None):
+    def Decrypt(self,
+                data: bytes,
+                passwords: List[Union[str, bytes]],
+                salt: Optional[Union[str, bytes]] = None,
+                itr_num: Optional[int] = None) -> None:
         # Log
         self.logger.GetLogger().info("Salt: %s" % salt)
 
@@ -81,14 +87,16 @@ class DataDecrypter:
         self.decrypted_data = curr_data
 
     # Get decrypted data
-    def GetDecryptedData(self):
+    def GetDecryptedData(self) -> bytes:
         return self.decrypted_data
 
     # Read internal key and IV
-    def __ReadInternalKeyIv(self, data, key_iv_gen):
+    def __ReadInternalKeyIv(self,
+                            data: bytes,
+                            key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
         # Get encrypted bytes and digest
-        key_iv_encrypted = data[DataDecrypterConst.INT_KEY_OFF : DataDecrypterConst.INT_KEY_IV_DIG_OFF]
-        key_iv_digest = data[DataDecrypterConst.INT_KEY_IV_DIG_OFF : DataDecrypterConst.DATA_ENC_OFF]
+        key_iv_encrypted = data[DataDecrypterConst.INT_KEY_OFF: DataDecrypterConst.INT_KEY_IV_DIG_OFF]
+        key_iv_digest = data[DataDecrypterConst.INT_KEY_IV_DIG_OFF: DataDecrypterConst.DATA_ENC_OFF]
 
         # Log
         self.logger.GetLogger().info("  Encrypted internal key/IV: %s" % binascii.hexlify(key_iv_encrypted))
@@ -102,12 +110,16 @@ class DataDecrypter:
         if not HmacSha256.QuickVerify(key_iv_gen.GetMasterKey(), key_iv_decrypted, key_iv_digest):
             raise DataHmacError("Invalid HMAC for internal key and IV")
 
-        return key_iv_decrypted[DataDecrypterConst.INT_KEY_OFF : DataDecrypterConst.INT_IV_OFF], key_iv_decrypted[DataDecrypterConst.INT_IV_OFF : DataDecrypterConst.INT_KEY_IV_PAD_OFF]
+        return key_iv_decrypted[DataDecrypterConst.INT_KEY_OFF: DataDecrypterConst.INT_IV_OFF],\
+               key_iv_decrypted[DataDecrypterConst.INT_IV_OFF: DataDecrypterConst.INT_KEY_IV_PAD_OFF]
 
     # Read data
-    def __ReadData(self, data, internal_key, internal_iv):
+    def __ReadData(self,
+                   data: bytes,
+                   internal_key: bytes,
+                   internal_iv: bytes) -> bytes:
         # Get encrypted bytes and digest
-        data_encrypted = data[DataDecrypterConst.DATA_ENC_OFF : DataDecrypterConst.DATA_DIG_OFF]
+        data_encrypted = data[DataDecrypterConst.DATA_ENC_OFF: DataDecrypterConst.DATA_DIG_OFF]
         data_digest = data[DataDecrypterConst.DATA_DIG_OFF:]
 
         # Log

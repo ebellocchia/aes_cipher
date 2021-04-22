@@ -106,7 +106,7 @@ Data decryption with single password and default salt:
     data_decrypter.Decrypt(data, "test_pwd")
     dec_data = data_decrypter.GetDecryptedData()
 
-Data decryption with multiple password and custom salt:
+Data decryption with multiple passwords and custom salt:
 
     data_decrypter = DataDecrypter()
     data_decrypter.Decrypt(data, [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ], "test_salt")

@@ -35,6 +35,9 @@ class LoggerConst:
 
 # Logger class
 class Logger:
+
+    logger: logging.Logger
+
     # Constructor
     def __init__(self,
                  name: str = "") -> None:

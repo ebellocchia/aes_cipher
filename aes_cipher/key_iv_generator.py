@@ -22,7 +22,7 @@
 # Imports
 #
 import os
-from typing import Union
+from typing import Optional, Union
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA512
 from Crypto.Protocol.KDF import PBKDF2
@@ -45,6 +45,12 @@ class KeyIvGeneratorConst:
 
 # Key and IV generator class
 class KeyIvGenerator:
+
+    master_key: bytes
+    master_iv: bytes
+    internal_key: bytes
+    internal_iv: bytes
+
     # Constructor
     def __init__(self) -> None:
         self.master_key = b""
@@ -55,11 +61,11 @@ class KeyIvGenerator:
     # Generate master key and IV from password
     def GenerateMaster(self,
                        password: Union[str, bytes],
-                       salt: Union[str, bytes],
-                       itr_num: int) -> None:
+                       salt: Optional[Union[str, bytes]],
+                       itr_num: Optional[int]) -> None:
         itr_num = KeyIvGeneratorConst.DEF_ITR_NUM if itr_num is None else itr_num
         if itr_num <= 0:
-            raise ValueError("Invalid iteration number")
+            raise ValueError(f"Invalid iteration number ({itr_num})")
 
         salt = KeyIvGeneratorConst.DEF_SALT if salt is None else salt
 

@@ -48,10 +48,14 @@ class DataDecrypterConst:
 
 # Data decrypter class
 class DataDecrypter:
+
+    decrypted_data: bytes
+    logger: Logger
+
     # Constructor
     def __init__(self,
                  logger: Logger = Logger()) -> None:
-        self.decrypted_data = ""
+        self.decrypted_data = b""
         self.logger = logger
 
     # Decrypt
@@ -61,7 +65,8 @@ class DataDecrypter:
                 salt: Optional[Union[str, bytes]] = None,
                 itr_num: Optional[int] = None) -> None:
         # Log
-        self.logger.GetLogger().info("Salt: %s" % salt)
+        if salt is not None:
+            self.logger.GetLogger().info(f"Salt: {Utils.DataToString(salt)}")
 
         # Initialize current data
         curr_data = data
@@ -69,8 +74,8 @@ class DataDecrypter:
         # Decrypt multiple times, one for each given password in reverse order
         for password in reversed(passwords):
             # Log
-            self.logger.GetLogger().info("Decrypting with password: %s" % password)
-            self.logger.GetLogger().info("  Current data: %s" % binascii.hexlify(Utils.Encode(curr_data)))
+            self.logger.GetLogger().info(f"Decrypting with password: {Utils.DataToString(password)}")
+            self.logger.GetLogger().info(f"  Current data: {Utils.BytesToHexStr(curr_data)}")
 
             # Generate keys and IVs
             key_iv_gen = KeyIvGenerator()
@@ -99,8 +104,8 @@ class DataDecrypter:
         key_iv_digest = data[DataDecrypterConst.INT_KEY_IV_DIG_OFF: DataDecrypterConst.DATA_ENC_OFF]
 
         # Log
-        self.logger.GetLogger().info("  Encrypted internal key/IV: %s" % binascii.hexlify(key_iv_encrypted))
-        self.logger.GetLogger().info("  Internal key/IV digest: %s" % binascii.hexlify(key_iv_digest))
+        self.logger.GetLogger().info(f"  Encrypted internal key/IV: {Utils.BytesToHexStr(key_iv_encrypted)}")
+        self.logger.GetLogger().info(f"  Internal key/IV digest: {Utils.BytesToHexStr(key_iv_digest)}")
 
         # Decrypt internal key and IV with master key and IV
         aes_decrypter = AesCbcDecrypter(key_iv_gen.GetMasterKey(), key_iv_gen.GetMasterIV())
@@ -123,8 +128,8 @@ class DataDecrypter:
         data_digest = data[DataDecrypterConst.DATA_DIG_OFF:]
 
         # Log
-        self.logger.GetLogger().info("  Encrypted data: %s" % binascii.hexlify(data_encrypted))
-        self.logger.GetLogger().info("  Data digest: %s" % binascii.hexlify(data_digest))
+        self.logger.GetLogger().info(f"  Encrypted data: {Utils.BytesToHexStr(data_encrypted)}")
+        self.logger.GetLogger().info(f"  Data digest: {Utils.BytesToHexStr(data_digest)}")
 
         # Decrypt data with internal key and IV
         aes_decrypter = AesCbcDecrypter(internal_key, internal_iv)
@@ -135,6 +140,6 @@ class DataDecrypter:
             raise DataHmacError("Invalid HMAC for data")
 
         # Log
-        self.logger.GetLogger().info("  Decrypted data: %s" % binascii.hexlify(data_decrypted))
+        self.logger.GetLogger().info(f"  Decrypted data: {Utils.BytesToHexStr(data_decrypted)}")
 
         return data_decrypted

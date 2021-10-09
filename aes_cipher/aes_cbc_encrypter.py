@@ -21,7 +21,7 @@
 #
 # Imports
 #
-from typing import Union
+from typing import Any, Union
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 from aes_cipher.aes_const import AesConst
@@ -34,11 +34,15 @@ from aes_cipher.utils import Utils
 
 # AES-CBC encrypter class
 class AesCbcEncrypter:
+
+    encrypted_data: bytes
+    aes: Any
+
     # Constructor
     def __init__(self,
                  key: Union[str, bytes],
                  iv: Union[str, bytes]) -> None:
-        self.encrypted_data = ""
+        self.encrypted_data = b""
         self.aes = AES.new(Utils.Encode(key), AES.MODE_CBC, iv=Utils.Encode(iv))
 
     # Encrypt data

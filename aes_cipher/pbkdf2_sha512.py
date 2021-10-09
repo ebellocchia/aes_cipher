@@ -38,4 +38,4 @@ class Pbkdf2Sha512:
     def Compute(password: Union[str, bytes],
                 salt: Union[str, bytes],
                 itr_num: int) -> bytes:
-        return PBKDF2(Utils.Encode(password), Utils.Encode(salt), SHA512.digest_size, itr_num, hmac_hash_module=SHA512)
+        return PBKDF2(Utils.Decode(password), Utils.Encode(salt), SHA512.digest_size, itr_num, hmac_hash_module=SHA512)

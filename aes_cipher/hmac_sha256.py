@@ -32,6 +32,9 @@ from aes_cipher.utils import Utils
 
 # HMAC-SHA256 class
 class HmacSha256:
+
+    hmac: HMAC.HMAC
+
     # Constructor
     def __init__(self,
                  key: Union[str, bytes]) -> None:

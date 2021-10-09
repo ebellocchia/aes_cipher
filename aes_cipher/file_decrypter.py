@@ -34,6 +34,9 @@ from aes_cipher.logger import Logger
 
 # File decrypter class
 class FileDecrypter:
+
+    decrypter: DataDecrypter
+
     # Constructor
     def __init__(self,
                  logger: Logger = Logger()) -> None:

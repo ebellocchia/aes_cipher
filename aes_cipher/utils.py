@@ -21,6 +21,7 @@
 #
 # Imports
 #
+import binascii
 from typing import Union
 
 
@@ -39,7 +40,7 @@ class Utils:
         elif isinstance(data, bytes):
             return data.decode(encoding)
         else:
-            raise RuntimeError("Invalid data type")
+            raise TypeError("Invalid data type")
 
     # Encode data to specified encoding
     @staticmethod
@@ -50,4 +51,19 @@ class Utils:
         elif isinstance(data, bytes):
             return data
         else:
-            raise RuntimeError("Invalid data type")
+            raise TypeError("Invalid data type")
+
+    # Convert data to string
+    @staticmethod
+    def DataToString(data: Union[str, bytes]) -> str:
+        if isinstance(data, str):
+            return data
+        elif isinstance(data, bytes):
+            return Utils.BytesToHexStr(data)
+        else:
+            raise TypeError("Invalid data type")
+
+    # Convert bytes to hex string
+    @staticmethod
+    def BytesToHexStr(data: bytes) -> str:
+        return Utils.Decode(binascii.hexlify(data))

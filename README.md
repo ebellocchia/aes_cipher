@@ -36,7 +36,14 @@ To run the tests:
 
         pip install coverage
         coverage run -m unittest discover
-        coverage report
+
+    - Get report:
+
+            coverage report
+
+    - Get HTML report:
+
+            coverage html
 
 ## APIs
 

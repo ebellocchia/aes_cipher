@@ -21,7 +21,6 @@
 #
 # Imports
 #
-import binascii
 from typing import List, Optional, Tuple, Union
 from aes_cipher.aes_const import AesConst
 from aes_cipher.aes_cbc_decrypter import AesCbcDecrypter

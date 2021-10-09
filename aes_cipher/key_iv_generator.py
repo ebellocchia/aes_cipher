@@ -23,12 +23,8 @@
 #
 import os
 from typing import Optional, Union
-from Crypto.Cipher import AES
-from Crypto.Hash import SHA512
-from Crypto.Protocol.KDF import PBKDF2
 from aes_cipher.aes_const import AesConst
 from aes_cipher.pbkdf2_sha512 import Pbkdf2Sha512
-from aes_cipher.utils import Utils
 
 
 #

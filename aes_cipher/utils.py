@@ -36,32 +36,35 @@ class Utils:
     def Decode(data: Union[str, bytes],
                encoding: str = "utf-8") -> str:
         if isinstance(data, str):
-            return data
+            dec = data
         elif isinstance(data, bytes):
-            return data.decode(encoding)
+            dec = data.decode(encoding)
         else:
             raise TypeError("Invalid data type")
+        return dec
 
     # Encode data to specified encoding
     @staticmethod
     def Encode(data: Union[str, bytes],
                encoding: str = "utf-8") -> bytes:
         if isinstance(data, str):
-            return data.encode(encoding)
+            dec = data.encode(encoding)
         elif isinstance(data, bytes):
-            return data
+            dec = data
         else:
             raise TypeError("Invalid data type")
+        return dec
 
     # Convert data to string
     @staticmethod
     def DataToString(data: Union[str, bytes]) -> str:
         if isinstance(data, str):
-            return data
+            dec = data
         elif isinstance(data, bytes):
-            return Utils.BytesToHexStr(data)
+            dec = Utils.BytesToHexStr(data)
         else:
             raise TypeError("Invalid data type")
+        return dec
 
     # Convert bytes to hex string
     @staticmethod

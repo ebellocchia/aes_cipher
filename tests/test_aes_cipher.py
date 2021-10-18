@@ -20,14 +20,14 @@
 
 
 # Imports
-import os, unittest
+import os
+import unittest
 from pathlib import Path
 from aes_cipher import DataDecrypter, DataEncrypter, FileDecrypter, FileEncrypter, DataHmacError, DataDecryptError
 from aes_cipher.data_decrypter import DataDecrypterConst
 from aes_cipher.file_reader import FileReader
 from aes_cipher.file_writer import FileWriter
 from aes_cipher.utils import Utils
-import binascii
 
 #
 # Constants
@@ -62,28 +62,28 @@ TEST_ITR = 1024 * 16
 class TestHelper:
     # Decrypt data
     @staticmethod
-    def decrypt_data(data, passwords, salt = None, itr_num = TEST_ITR):
+    def decrypt_data(data, passwords, salt=None, itr_num=TEST_ITR):
         data_decrypter = DataDecrypter()
         data_decrypter.Decrypt(data, passwords, salt, itr_num)
         return data_decrypter.GetDecryptedData()
 
     # Encrypt data
     @staticmethod
-    def encrypt_data(data, passwords, salt = None, itr_num = TEST_ITR):
+    def encrypt_data(data, passwords, salt=None, itr_num=TEST_ITR):
         data_encrypter = DataEncrypter()
         data_encrypter.Encrypt(data, passwords, salt, itr_num)
         return data_encrypter.GetEncryptedData()
 
     # Decrypt file
     @staticmethod
-    def decrypt_file(file_in, file_out, passwords, salt = None, itr_num = TEST_ITR):
+    def decrypt_file(file_in, file_out, passwords, salt=None, itr_num=TEST_ITR):
         file_decrypter = FileDecrypter()
         file_decrypter.Decrypt(file_in, passwords, salt, itr_num)
         file_decrypter.SaveTo(file_out)
 
     # Encrypt file
     @staticmethod
-    def encrypt_file(file_in, file_out, passwords, salt = None, itr_num = TEST_ITR):
+    def encrypt_file(file_in, file_out, passwords, salt=None, itr_num=TEST_ITR):
         file_encrypter = FileEncrypter()
         file_encrypter.Encrypt(file_in, passwords, salt, itr_num)
         file_encrypter.SaveTo(file_out)

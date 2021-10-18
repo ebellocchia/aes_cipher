@@ -13,8 +13,7 @@ def load_version():
 
     if matches and len(matches) > 0:
         return matches[0]
-    else:
-        raise RuntimeError("Cannot find version string in %s" % VERSION_FILE)
+    raise RuntimeError("Cannot find version string in %s" % VERSION_FILE)
 
 version = load_version()
 
@@ -37,7 +36,11 @@ setuptools.setup(
     keywords="cipher, aes, aes256, sha, sha256, sha512, pbkdf2, pbkdf2-sha512, hmac, hmac-sha256",
     platforms = ["any"],
     classifiers=[
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Intended Audience :: Developers",

@@ -38,7 +38,7 @@ Or you can install *tox*:
 
 And then simply run *tox*:
 
-   tox
+    tox
 
 To run tests and get the code coverage and report.
 

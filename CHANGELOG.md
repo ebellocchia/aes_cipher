@@ -1,3 +1,8 @@
+# 1.0.4
+
+- Add configuration for _isort_ and run it on project
+- Logger set to `None` if not specified (avoid conflicting with other logger config)
+
 # 1.0.3
 
 - Add configuration files for _flake8_ and _prospector_

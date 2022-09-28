@@ -39,11 +39,11 @@ from aes_cipher.utils import Utils
 class DataEncrypter:
 
     encrypted_data: bytes
-    logger: Logger
+    logger: Optional[Logger]
 
     # Constructor
     def __init__(self,
-                 logger: Logger = Logger()) -> None:
+                 logger: Optional[Logger] = None) -> None:
         self.encrypted_data = b""
         self.logger = logger
 
@@ -55,7 +55,7 @@ class DataEncrypter:
                 itr_num: Optional[int] = None) -> None:
         # Log
         if salt is not None:
-            self.logger.GetLogger().info(f"Salt: {Utils.DataToString(salt)}")
+            self.__Log(f"Salt: {Utils.DataToString(salt)}")
 
         # Initialize current data
         curr_data = Utils.Encode(data)
@@ -63,8 +63,8 @@ class DataEncrypter:
         # Encrypt multiple times, one for each given password
         for password in passwords:
             # Log
-            self.logger.GetLogger().info(f"Encrypting with password: {Utils.DataToString(password)}")
-            self.logger.GetLogger().info(f"  Current data: {Utils.DataToString(curr_data)}")
+            self.__Log(f"Encrypting with password: {Utils.DataToString(password)}")
+            self.__Log(f"  Current data: {Utils.DataToString(curr_data)}")
 
             # Generate keys and IVs
             key_iv_gen = KeyIvGenerator()
@@ -84,7 +84,7 @@ class DataEncrypter:
             data_buffer.write(data_digest)
 
             # Log
-            self.logger.GetLogger().info(f"  Buffer: {Utils.BytesToHexStr(data_buffer.getvalue())}")
+            self.__Log(f"  Buffer: {Utils.BytesToHexStr(data_buffer.getvalue())}")
 
             # Update current data
             curr_data = data_buffer.getvalue()
@@ -107,8 +107,8 @@ class DataEncrypter:
                                                key_iv_gen.GetInternalKey() + key_iv_gen.GetInternalIV())
 
         # Log
-        self.logger.GetLogger().info(f"  Encrypted internal key/IV: {Utils.BytesToHexStr(key_iv_encrypted)}")
-        self.logger.GetLogger().info(f"  Internal key/IV digest: {Utils.BytesToHexStr(key_iv_digest)}")
+        self.__Log(f"  Encrypted internal key/IV: {Utils.BytesToHexStr(key_iv_encrypted)}")
+        self.__Log(f"  Internal key/IV digest: {Utils.BytesToHexStr(key_iv_digest)}")
 
         return key_iv_encrypted, key_iv_digest
 
@@ -124,7 +124,13 @@ class DataEncrypter:
         data_digest = HmacSha256.QuickDigest(key_iv_gen.GetInternalKey(), data)
 
         # Log
-        self.logger.GetLogger().info(f"  Encrypted data: {Utils.BytesToHexStr(data_encrypted)}")
-        self.logger.GetLogger().info(f"  Data digest: {Utils.BytesToHexStr(data_digest)}")
+        self.__Log(f"  Encrypted data: {Utils.BytesToHexStr(data_encrypted)}")
+        self.__Log(f"  Data digest: {Utils.BytesToHexStr(data_digest)}")
 
         return data_encrypted, data_digest
+
+    # Log
+    def __Log(self,
+              message: str) -> None:
+        if self.logger is not None:
+            self.logger.GetLogger().info(message)

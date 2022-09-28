@@ -40,7 +40,7 @@ class FileDecrypter:
 
     # Constructor
     def __init__(self,
-                 logger: Logger = Logger()) -> None:
+                 logger: Optional[Logger] = None) -> None:
         self.decrypter = DataDecrypter(logger)
 
     # Decrypt

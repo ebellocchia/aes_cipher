@@ -22,7 +22,9 @@
 # Imports
 #
 from typing import Union
+
 from Crypto.Hash import HMAC, SHA256
+
 from aes_cipher.utils import Utils
 
 

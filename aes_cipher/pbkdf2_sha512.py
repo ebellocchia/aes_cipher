@@ -22,8 +22,10 @@
 # Imports
 #
 from typing import Union
+
 from Crypto.Hash import SHA512
 from Crypto.Protocol.KDF import PBKDF2
+
 from aes_cipher.utils import Utils
 
 

@@ -22,8 +22,10 @@
 # Imports
 #
 from typing import Any, Union
+
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
+
 from aes_cipher.aes_const import AesConst
 from aes_cipher.utils import Utils
 

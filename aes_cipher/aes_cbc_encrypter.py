@@ -45,7 +45,11 @@ class AesCbcEncrypter:
                  key: Union[str, bytes],
                  iv: Union[str, bytes]) -> None:
         self.encrypted_data = b""
-        self.aes = AES.new(Utils.Encode(key), AES.MODE_CBC, iv=Utils.Encode(iv))
+        self.aes = AES.new(
+            Utils.Encode(key),
+            AES.MODE_CBC,
+            iv=Utils.Encode(iv)
+        )
 
     # Encrypt data
     def Encrypt(self,

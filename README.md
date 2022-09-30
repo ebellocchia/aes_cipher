@@ -44,45 +44,45 @@ To run tests and get the code coverage and report.
 
 ## APIs
 
-*DataEncrypter* class:
+`DataEncrypter` class:
 
-- **DataEncrypter.Encrypt(data, passwords [, salt, itr_num])**: encrypt data with the specified passwords, salt and iteration number
-    - *data*: input data (string or bytes)
-    - *passwords*: single password (string) or multiple passwords (array of strings)
-    - *salt*: custom salt. If not specified, the default salt "[]=?AeS_CiPhEr><()" will be used.
-    - *itr_num*: number of iterations for PBKDF2-SHA512 algorithm. If not specified, the default value of 524288 (1024 * 512) will be used.
-- **DataEncrypter.GetEncryptedData()**: get encrypted data (bytes)
+- `DataEncrypter.Encrypt(data, passwords [, salt, itr_num])`: encrypt data with the specified passwords, salt and iteration number
+    - `data`: input data (string or bytes)
+    - `passwords`: single password (string) or multiple passwords (array of strings)
+    - `salt`: custom salt. If not specified, the default salt `[]=?AeS_CiPhEr><()` will be used.
+    - `itr_num`: number of iterations for PBKDF2-SHA512 algorithm. If not specified, the default value of 524288 (1024 * 512) will be used.
+- `DataEncrypter.GetEncryptedData()`: get encrypted data (bytes)
 
-*FileEncrypter* class: encrypt file
+`FileEncrypter` class: encrypt file
 
-- **FileEncrypter.Encrypt(file_in, passwords [, salt, itr_num])**: encrypt file with the specified passwords, salt and iteration number
-    - *file_in*: input file
-    - *passwords*: see *DataEncrypter.Encrypt*
-    - *salt*: see *DataEncrypter.Encrypt*
-    - *itr_num*: see *DataEncrypter.Encrypt*
-- **FileEncrypter.GetEncryptedData()**: get encrypted data (bytes)
-- **FileEncrypter.SaveTo(file_out)**: save to file
-    - *file_out*: output file to be saved
+- `FileEncrypter.Encrypt(file_in, passwords [, salt, itr_num])`: encrypt file with the specified passwords, salt and iteration number
+    - `file_in`: input file
+    - `passwords`: see `DataEncrypter.Encrypt`
+    - `salt`: see `DataEncrypter.Encrypt`
+    - `itr_num`: see `DataEncrypter.Encrypt`
+- `FileEncrypter.GetEncryptedData()`: get encrypted data (bytes)
+- `FileEncrypter.SaveTo(file_out)`: save to file
+    - `file_out`: output file to be saved
 
-*DataDecrypter* class:
+`DataDecrypter` class:
 
-- **DataDecrypter.Decrypt(data, passwords [, salt, itr_num])**: decrypt data with the specified passwords, salt and iteration number
-    - *data*: input data (string or bytes)
-    - *passwords*: see *DataEncrypter.Encrypt*
-    - *salt*: see *DataEncrypter.Encrypt*
-    - *itr_num*: see *DataEncrypter.Encrypt*
-- **DataDecrypter.GetDecryptedData()**: get decrypted data (bytes)
+- `DataDecrypter.Decrypt(data, passwords [, salt, itr_num])`: decrypt data with the specified passwords, salt and iteration number
+    - `data`: input data (string or bytes)
+    - `passwords`: see `DataEncrypter.Encrypt`
+    - `salt`: see `DataEncrypter.Encrypt`
+    - `itr_num`: see `DataEncrypter.Encrypt`
+- `DataDecrypter.GetDecryptedData()`: get decrypted data (bytes)
 
-*FileDecrypter* class:
+`FileDecrypter` class:
 
-- **FileDecrypter.Decrypt(file_in, passwords [, salt, itr_num])**
-    - *file_in*: input file
-    - *passwords*: see *DataDecrypter.Decrypt*
-    - *salt*: see *DataDecrypter.Decrypt*
-    - *itr_num*: see *DataDecrypter.Decrypt*
-- **FileDecrypter.GetDecryptedData()**: get decrypted data (bytes)
-- **FileDecrypter.SaveTo(file_out)**: save to file
-    - *file_out*: output file to be saved
+- `FileDecrypter.Decrypt(file_in, passwords [, salt, itr_num])`
+    - `file_in`: input file
+    - `passwords`: see `DataDecrypter.Decrypt`
+    - `salt`: see `DataDecrypter.Decrypt`
+    - `itr_num`: see `DataDecrypter.Decrypt`
+- `FileDecrypter.GetDecryptedData()`: get decrypted data (bytes)
+- `FileDecrypter.SaveTo(file_out)`: save to file
+    - `file_out`: output file to be saved
 
 ## Examples
 

@@ -101,7 +101,7 @@ Data encryption with single password and custom salt:
 Data encryption with multiple passwords, default salt and custom number of iterations:
 
     data_encrypter = DataEncrypter()
-    data_encrypter.Encrypt(data, [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ], itr_num=1048576)
+    data_encrypter.Encrypt(data, ["test_pwd_1", "test_pwd_2", "test_pwd_3"], itr_num=1048576)
     enc_data = data_encrypter.GetEncryptedData()
 
 Data decryption with single password and default salt:
@@ -113,7 +113,7 @@ Data decryption with single password and default salt:
 Data decryption with multiple passwords and custom salt:
 
     data_decrypter = DataDecrypter()
-    data_decrypter.Decrypt(data, [ "test_pwd_1", "test_pwd_2", "test_pwd_3" ], "test_salt")
+    data_decrypter.Decrypt(data, ["test_pwd_1", "test_pwd_2", "test_pwd_3"], "test_salt")
     dec_data = data_decrypter.GetDecryptedData()
 
 File encryption with single password and default salt:
@@ -122,10 +122,10 @@ File encryption with single password and default salt:
     file_encrypter.Encrypt(file_in, "test_pwd")
     file_encrypter.SaveTo(file_out)
 
-Enable verbose mode:
+Enable logging:
 
-    logger = Logger()
-    logger.SetVerbose(True)
+    data_encrypter = DataEncrypter()
+    data_encrypter.Logger().SetLevel(logging.INFO)
 
-    data_encrypter = DataEncrypter(logger)
-    data_encrypter = DataDecrypter(logger)
+    data_decrypter = DataDecrypter()
+    data_decrypter.Logger().SetLevel(logging.INFO)

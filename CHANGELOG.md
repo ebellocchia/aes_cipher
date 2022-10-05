@@ -1,3 +1,7 @@
+# 1.0.5
+
+- Fix setting of logging level
+
 # 1.0.4
 
 - Add configuration for _isort_ and run it on project

@@ -8,17 +8,26 @@
 
 ## Introduction
 
-AES cipher is a simple application to encrypt/decrypt using AES256-CBC. It is possible to encrypt/decrypt both files and data (string or bytes).
+AES cipher is a library to encrypt/decrypt using AES256-CBC. It is possible to encrypt/decrypt both files and raw data (string or bytes).
 
-A master key and IV are derived from the given password and salt using PBKDF2-SHA512. Then a random key and IV are generated and used to encrypt the actual data (in this way, if the same file is encrypted with the same password multiple times, the encrypted file will always be different). Finally, these random key and IV are encrypted with the master key and IV.
+# How it works
 
-It is possible to specify a single password or a list of passwords, in this case the file will be encrypted multiple times with a different password each time. The integrity of the encrypted key , IV and file data are ensured using HMAC-SHA256.
+1. A master key and IV are derived from the given password and (optionally) salt using a key derivation function. The key derivation function can be chosen among the provided ones:
+   - PBKDF2-SHA512
+   - Scrypt
 
-*pycryptodome* is used as crypto library.
+    Alternatively, it can also be customized by the user by simply implementing the `IKeyDerivator` interface.\
+    Salt is randomly generated (16-byte long) if not specified.
+2. A random key and IV are generated and used to encrypt the actual data. In this way, if the same file is encrypted with the same password multiple times, the encrypted file will always be different. 
+3. The random key and IV are encrypted with the master key and IV
+4. HMAC-SHA256 of the encrypted key/IV and file data is computed to ensure integrity, using the master key as key
+
+It is possible to specify either a single password or a list of passwords.
+In the last case, the file will be encrypted multiple times with a different password each time.
 
 ## Installation
 
-The package requires Python 3, it is not compatible with Python 2.
+The package requires Python >= 3.7.\
 To install it:
 - Using *setuptools*:
 
@@ -47,79 +56,119 @@ For quick test:
 
 ## APIs
 
-`DataEncrypter` class:
+### Key derivation
 
-- `DataEncrypter.Encrypt(data, passwords [, salt, itr_num])`: encrypt data with the specified passwords, salt and iteration number
+`Pbkdf2Sha512` class: derive keys using PBKDF2-SHA512 algorithm
+  - `Pbkdf2Sha512(itr_num)`: construct the class
+    - `itr_num`: iterations number
+
+For default values, the `Pbkdf2Sha512Default` class instance can be used:
+
+    Pbkdf2Sha512Default = Pbkdf2Sha512(512 * 1024)
+
+`Scrypt` class: derive keys using Scrypt algorithm
+  - `Scrypt(n, p, r)`: construct the class
+    - `n`: CPU/Memory cost parameter
+    - `p`: block size parameter
+    - `r`: parallelization parameter
+
+For default values, the `ScryptDefault` class instance can be used:
+
+    ScryptDefault = Scrypt(16384, 8, 8)
+
+To add a custom key derivation function, the `IKeyDerivator` interface shall be implemented:
+
+    class IKeyDerivator(ABC):
+        @abstractmethod
+        def DeriveKey(self,
+                      password: Union[str, bytes],
+                      salt: Union[str, bytes]) -> bytes:
+            pass
+
+The only requirement is that the output of the `DeriveKey` method is at least 48-byte long.\
+A constructor can be added to customize the algorithm.
+
+### Encryption
+
+`DataEncrypter` class: encrypt bytes or string data
+
+- `DataEncrypter(key_derivator)`: construct the class
+  - `key_derivator`: key derivator to be used for master key and IV generation, it shall be an instance of the `IKeyDerivator` interface. Default value: `Pbkdf2Sha512Default`.
+- `DataEncrypter.Encrypt(data, passwords [, salts])`: encrypt data with the specified passwords and salts
     - `data`: input data (string or bytes)
-    - `passwords`: single password (string) or multiple passwords (array of strings)
-    - `salt`: custom salt. If not specified, the default salt `[]=?AeS_CiPhEr><()` will be used.
-    - `itr_num`: number of iterations for PBKDF2-SHA512 algorithm. If not specified, the default value of 524288 (1024 * 512) will be used.
+    - `passwords`: single password (string) or multiple passwords (list of strings)
+    - `salts` (optional): single salt (string) or multiple salts (list of strings). The number of salts shall be the same of the passwords. If not specified, salts will be randomly generated (16-byte long).
 - `DataEncrypter.GetEncryptedData()`: get encrypted data (bytes)
 
-`FileEncrypter` class: encrypt file
+`FileEncrypter` class: encrypt a file
 
-- `FileEncrypter.Encrypt(file_in, passwords [, salt, itr_num])`: encrypt file with the specified passwords, salt and iteration number
+- `FileEncrypter(key_derivator)`: construct the class
+  - `key_derivator`: see `DataEncrypter` constructor
+- `FileEncrypter.Encrypt(file_in, passwords [, salts])`: encrypt file with the specified passwords, salt and iteration number
     - `file_in`: input file
     - `passwords`: see `DataEncrypter.Encrypt`
-    - `salt`: see `DataEncrypter.Encrypt`
-    - `itr_num`: see `DataEncrypter.Encrypt`
+    - `salts`: see `DataEncrypter.Encrypt`
 - `FileEncrypter.GetEncryptedData()`: get encrypted data (bytes)
 - `FileEncrypter.SaveTo(file_out)`: save to file
     - `file_out`: output file to be saved
 
-`DataDecrypter` class:
+### Decryption
 
-- `DataDecrypter.Decrypt(data, passwords [, salt, itr_num])`: decrypt data with the specified passwords, salt and iteration number
+`DataDecrypter` class: decrypt bytes or string data
+
+- `DataDecrypter(key_derivator)`: construct the class
+  - `key_derivator`: key derivator to be used for master key and IV generation, it shall be an instance of the `IKeyDerivator` interface. Default value: `Pbkdf2Sha512Default`.
+- `DataDecrypter.Decrypt(data, passwords)`: decrypt data with the specified passwords, salt and iteration number
     - `data`: input data (string or bytes)
     - `passwords`: see `DataEncrypter.Encrypt`
-    - `salt`: see `DataEncrypter.Encrypt`
-    - `itr_num`: see `DataEncrypter.Encrypt`
 - `DataDecrypter.GetDecryptedData()`: get decrypted data (bytes)
 
-`FileDecrypter` class:
+`FileDecrypter` class: decrypt a file
 
-- `FileDecrypter.Decrypt(file_in, passwords [, salt, itr_num])`
+- `FileDecrypter(key_derivator)`: construct the class
+  - `key_derivator`: see `DataDecrypter` constructor
+- `FileDecrypter.Decrypt(file_in, passwords)`
     - `file_in`: input file
     - `passwords`: see `DataDecrypter.Decrypt`
-    - `salt`: see `DataDecrypter.Decrypt`
-    - `itr_num`: see `DataDecrypter.Decrypt`
 - `FileDecrypter.GetDecryptedData()`: get decrypted data (bytes)
 - `FileDecrypter.SaveTo(file_out)`: save to file
     - `file_out`: output file to be saved
 
 ## Examples
 
-Data encryption with single password and default salt:
+Data encryption with single password and random salt, using PBKDF2-SHA512 algorithm with default values:
 
-    data_encrypter = DataEncrypter()
+    data_encrypter = DataEncrypter(Pbkdf2Sha512Default)
     data_encrypter.Encrypt(data, "test_pwd")
     enc_data = data_encrypter.GetEncryptedData()
 
-Data encryption with single password and custom salt:
+Data encryption with single password and custom salt, using PBKDF2-SHA512 algorithm with custom values:
 
-    data_encrypter = DataEncrypter()
-    data_encrypter.Encrypt(data, "test_pwd", "test_salt")
+    data_encrypter = DataEncrypter(
+        Pbkdf2Sha512(1024 * 1024)
+    )
+    data_encrypter.Encrypt(data, ["test_pwd"], ["test_salt"])
     enc_data = data_encrypter.GetEncryptedData()
 
-Data encryption with multiple passwords, default salt and custom number of iterations:
+Data encryption with multiple passwords and custom salts, using Scrypt algorithm with default values:
 
-    data_encrypter = DataEncrypter()
-    data_encrypter.Encrypt(data, ["test_pwd_1", "test_pwd_2", "test_pwd_3"], itr_num=1048576)
+    data_encrypter = DataEncrypter(ScryptDefault)
+    data_encrypter.Encrypt(data, ["test_pwd_1", "test_pwd_2"], ["test_salt_1", "test_salt_2"])
     enc_data = data_encrypter.GetEncryptedData()
 
-Data decryption with single password and default salt:
+Data decryption with single password and random salt:
 
     data_decrypter = DataDecrypter()
-    data_decrypter.Decrypt(data, "test_pwd")
+    data_decrypter.Decrypt(data, ["test_pwd"])
     dec_data = data_decrypter.GetDecryptedData()
 
-Data decryption with multiple passwords and custom salt:
+Data decryption with multiple passwords and custom salts:
 
     data_decrypter = DataDecrypter()
-    data_decrypter.Decrypt(data, ["test_pwd_1", "test_pwd_2", "test_pwd_3"], "test_salt")
+    data_decrypter.Decrypt(data, ["test_pwd_1", "test_pwd_2"], ["test_salt_1", "test_salt_2"])
     dec_data = data_decrypter.GetDecryptedData()
 
-File encryption with single password and default salt:
+File encryption with single password and random salt:
 
     file_encrypter = FileEncrypter()
     file_encrypter.Encrypt(file_in, "test_pwd")
@@ -135,24 +184,24 @@ Enable logging:
 
 ## Sample Application
 
-A sample application based on the library can be found in the *app* folder.
+A sample application based on the library using the PBKDF2-SHA512 algorithm can be found in the *app* folder.
 
 Basic usage:
 
-    python aes_cipher_app.py -m <enc:dec> -p <password1,password2,...> -i <input_files_or_folder> -o <output_folder> [-s <salt>] [-t <itr_num>] [-v] [-h]
+    python aes_cipher_app.py -m <enc:dec> -p <password1,password2,...> -i <input_files_or_folder> -o <output_folder> [-s <salt1,salt2,...>] [-t <itr_num>] [-v] [-h]
 
 Parameters description:
 
-|Short name|Long name|Description|
-|---|---|---|
-|`-m`|`--mode`|Operational mode: `enc` for encrypting, `dec` for decrypting|
-|`-p`|`--password`|Password used for encrypting/decrypting. It can be a single password or a list of passwords separated by a comma|
-|`-i`|`--input`|Input to be encrypted/decrypted. It can be a single file, a list of files separated by a comma or a folder (in this case all files in the folder will be encrypted/decrypted)|
-|`-o`|`--output`|Output folder where the encrypted/decrypted files will be saved|
-|`-s`|`--salt`|Optional: custom salt for master key and IV derivation, default value: `[]=?AeS_CiPhEr><()`|
-|`-t`|`--iteration`|Optional: number of iteration for PBKDF2-SHA512 algorithm, default value: 524288|
-|`-v`|`--verbose`|Optional: enable verbose mode|
-|`-h`|`--help`|Optional: print usage and exit|
+|Short name|Long name| Description                                                                                                                                                                   |
+|---|---|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|`-m`|`--mode`| Operational mode: `enc` for encrypting, `dec` for decrypting                                                                                                                  |
+|`-p`|`--password`| Password used for encrypting/decrypting. It can be a single password or a list of passwords separated by a comma                                                              |
+|`-i`|`--input`| Input to be encrypted/decrypted. It can be a single file, a list of files separated by a comma or a folder (in this case all files in the folder will be encrypted/decrypted) |
+|`-o`|`--output`| Output folder where the encrypted/decrypted files will be saved                                                                                                               |
+|`-s`|`--salt`| Optional: custom salts for master key and IV derivation, random if not specified`                                                                                             |
+|`-t`|`--iteration`| Optional: number of iteration for the PBKDF2-SHA512 algorithm, default value: 524288                                                                                          |
+|`-v`|`--verbose`| Optional: enable verbose mode                                                                                                                                                 |
+|`-h`|`--help`| Optional: print usage and exit                                                                                                                                                |
 
 **NOTE:** the password shall not contain spaces or commas (in this case it will be interpreted as multiple passwords)
 
@@ -170,10 +219,10 @@ Examples:
 
         python aes_cipher_app.py -m enc -p test_pwd -i input_file1,input_file2,input_file3 -o encrypted -s test_salt
 
-- Encrypt a file 3 times using 3 passwords with default salt and custom number of iteration:
+- Encrypt a file 3 times using 3 passwords with random salts and custom number of iteration:
 
-        python aes_cipher_app.py -m enc -p test_pwd1,test_pwd2,test_pwd3 -t 131072 -i input_file -o encrypted
+        python aes_cipher_app.py -m enc -p test_pwd_1,test_pwd_2,test_pwd_3 -t 131072 -i input_file -o encrypted
 
 - Decrypt the previous file:
 
-        python aes_cipher_app.py -m dec -p test_pwd1,test_pwd2,test_pwd3 -t 131072 -i encrypted -o decrypted
+        python aes_cipher_app.py -m dec -p test_pwd_1,test_pwd_2,test_pwd_3 -t 131072 -i encrypted -o decrypted

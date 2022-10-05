@@ -38,13 +38,13 @@ from aes_cipher import DataDecryptError, DataHmacError, FileDecrypter, FileEncry
 # Argument types
 @unique
 class ArgumentTypes(Enum):
-    MODE = auto(),
-    PASSWORDS = auto(),
-    INPUT_PATHS = auto(),
-    OUTPUT_PATH = auto(),
-    SALT = auto(),
-    ITR_NUM = auto(),
-    VERBOSE = auto(),
+    MODE = auto()
+    PASSWORDS = auto()
+    INPUT_PATHS = auto()
+    OUTPUT_PATH = auto()
+    SALT = auto()
+    ITR_NUM = auto()
+    VERBOSE = auto()
 
 
 # Arguments
@@ -118,17 +118,17 @@ class ArgumentsParser:
             "-p", "--password",
             type=lambda v: v.split(","),
             required=True,
-            help="password used for encrypting/decrypting (single password or a list of comma-separated passwords)"
+            help="password used for encrypting/decrypting (single password or comma-separated list of passwords)"
         )
         required.add_argument(
             "-i", "--input",
-            type=lambda v: self.__ParseInputPaths(v),
+            type=self.__ParseInputPaths,
             required=True,
-            help="input to be encrypted/decrypted, it can be a single file, a list of files separated by a comma or a folder"
+            help="input to be encrypted/decrypted (single file, comma-separated list of files or a folder)"
         )
         required.add_argument(
             "-o", "--output",
-            type=lambda v: Path(v),
+            type=Path,
             required=True,
             help="output folder where the encrypted/decrypted files will be saved"
         )
@@ -181,6 +181,49 @@ class ArgumentsParser:
 # Functions
 #
 
+# Encrypt file
+def EncryptFile(in_file: str,
+                out_path: str,
+                args: Arguments) -> None:
+    print(f"Encrypting file: '{in_file}'...")
+
+    file_encrypter = FileEncrypter()
+    if args.IsVerbose():
+        file_encrypter.Logger().SetLevel(logging.INFO)
+    file_encrypter.Encrypt(
+        in_file,
+        args.GetValue(ArgumentTypes.PASSWORDS),
+        args.GetValue(ArgumentTypes.SALT),
+        args.GetValue(ArgumentTypes.ITR_NUM))
+    file_encrypter.SaveTo(out_path)
+
+    print(f"Output file saved to: '{out_path}'")
+
+
+# Decrypt file
+def DecryptFile(in_file: str,
+                out_path: str,
+                args: Arguments) -> None:
+    print(f"Decrypting file: '{in_file}'...")
+
+    try:
+        file_decrypter = FileDecrypter()
+        if args.IsVerbose():
+            file_decrypter.Logger().SetLevel(logging.INFO)
+        file_decrypter.Decrypt(
+            in_file,
+            args.GetValue(ArgumentTypes.PASSWORDS),
+            args.GetValue(ArgumentTypes.SALT),
+            args.GetValue(ArgumentTypes.ITR_NUM))
+        file_decrypter.SaveTo(out_path)
+
+        print(f"Output file saved to: '{out_path}'")
+    except DataHmacError:
+        print(f"ERROR: file HMAC is not valid '{in_file}'")
+    except DataDecryptError:
+        print(f"ERROR: unable to decrypt file '{in_file}'")
+
+
 # Run application
 def RunApp(args: Arguments) -> None:
     enc_suffix: str = "_enc"
@@ -191,7 +234,7 @@ def RunApp(args: Arguments) -> None:
         print("No input files specified, exiting...")
         sys.exit(1)
 
-    print("Input files: %s" % ", ".join([str(p) for p in input_paths]))
+    print(f"Input files: {', '.join([str(p) for p in input_paths])}")
 
     # Get output path
     output_path = args.GetValue(ArgumentTypes.OUTPUT_PATH)
@@ -204,44 +247,12 @@ def RunApp(args: Arguments) -> None:
     if args.IsEncryptMode():
         for curr_path in input_paths:
             out_path = output_path / curr_path.with_stem(curr_path.stem + enc_suffix).name
-
-            print("Encrypting file: '%s'..." % curr_path)
-
-            file_encrypter = FileEncrypter()
-            if args.IsVerbose():
-                file_encrypter.Logger().SetLevel(logging.INFO)
-            file_encrypter.Encrypt(
-                curr_path,
-                args.GetValue(ArgumentTypes.PASSWORDS),
-                args.GetValue(ArgumentTypes.SALT),
-                args.GetValue(ArgumentTypes.ITR_NUM))
-            file_encrypter.SaveTo(out_path)
-
-            print("Output file saved to: '%s'" % out_path)
-
+            EncryptFile(curr_path, out_path, args)
     # Decrypt files
     elif args.IsDecryptMode():
         for curr_path in input_paths:
             out_path = output_path / curr_path.with_stem(curr_path.stem.replace(enc_suffix, "")).name
-
-            print("Decrypting file: '%s'..." % curr_path)
-
-            try:
-                file_decrypter = FileDecrypter()
-                if args.IsVerbose():
-                    file_decrypter.Logger().SetLevel(logging.INFO)
-                file_decrypter.Decrypt(
-                    curr_path,
-                    args.GetValue(ArgumentTypes.PASSWORDS),
-                    args.GetValue(ArgumentTypes.SALT),
-                    args.GetValue(ArgumentTypes.ITR_NUM))
-                file_decrypter.SaveTo(out_path)
-
-                print("Output file saved to: '%s'" % out_path)
-            except DataHmacError:
-                print("ERROR: file HMAC is not valid '%s'" % curr_path)
-            except DataDecryptError:
-                print("ERROR: unable to decrypt file '%s'" % curr_path)
+            DecryptFile(curr_path, out_path, args)
 
     print("Operation completed")
 

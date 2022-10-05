@@ -24,7 +24,9 @@ import os
 import unittest
 from pathlib import Path
 
-from aes_cipher import DataDecrypter, DataDecryptError, DataEncrypter, DataHmacError, FileDecrypter, FileEncrypter
+from aes_cipher import (
+    DataDecrypter, DataDecryptError, DataEncrypter, DataHmacError, FileDecrypter, FileEncrypter, Pbkdf2Sha512, Scrypt
+)
 from aes_cipher.data_decrypter import DataDecrypterConst
 from aes_cipher.file_reader import FileReader
 from aes_cipher.file_writer import FileWriter
@@ -65,29 +67,29 @@ class TestHelper:
     # Decrypt data
     @staticmethod
     def decrypt_data(data, passwords, salt=None, itr_num=TEST_ITR):
-        data_decrypter = DataDecrypter()
-        data_decrypter.Decrypt(data, passwords, salt, itr_num)
+        data_decrypter = DataDecrypter(Pbkdf2Sha512(itr_num))
+        data_decrypter.Decrypt(data, passwords, salt)
         return data_decrypter.GetDecryptedData()
 
     # Encrypt data
     @staticmethod
     def encrypt_data(data, passwords, salt=None, itr_num=TEST_ITR):
-        data_encrypter = DataEncrypter()
-        data_encrypter.Encrypt(data, passwords, salt, itr_num)
+        data_encrypter = DataEncrypter(Pbkdf2Sha512(itr_num))
+        data_encrypter.Encrypt(data, passwords, salt)
         return data_encrypter.GetEncryptedData()
 
     # Decrypt file
     @staticmethod
     def decrypt_file(file_in, file_out, passwords, salt=None, itr_num=TEST_ITR):
-        file_decrypter = FileDecrypter()
-        file_decrypter.Decrypt(file_in, passwords, salt, itr_num)
+        file_decrypter = FileDecrypter(Pbkdf2Sha512(itr_num))
+        file_decrypter.Decrypt(file_in, passwords, salt)
         file_decrypter.SaveTo(file_out)
 
     # Encrypt file
     @staticmethod
     def encrypt_file(file_in, file_out, passwords, salt=None, itr_num=TEST_ITR):
-        file_encrypter = FileEncrypter()
-        file_encrypter.Encrypt(file_in, passwords, salt, itr_num)
+        file_encrypter = FileEncrypter(Pbkdf2Sha512(itr_num))
+        file_encrypter.Encrypt(file_in, passwords, salt)
         file_encrypter.SaveTo(file_out)
 
     # Compare files
@@ -150,11 +152,6 @@ class CipherTests(unittest.TestCase):
         TestHelper.corrupt_file(TEST_ENC_FILE, DataDecrypterConst.DATA_ENC_OFF)
         self.assertRaises(DataHmacError, TestHelper.decrypt_file, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
 
-    # Test iteration number error
-    def test_itrnum_error(self):
-        self.assertRaises(ValueError, TestHelper.encrypt_data, TEST_STR, TEST_SINGLE_PWD_1, TEST_SALT_1, 0)
-        self.assertRaises(ValueError, TestHelper.encrypt_data, TEST_STR, TEST_SINGLE_PWD_1, TEST_SALT_1, -1)
-
     # Test error when decrypting with wrong single password
     def test_wrong_single_password(self):
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1)
@@ -170,7 +167,6 @@ class CipherTests(unittest.TestCase):
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1, TEST_SALT_1)
         self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_2, TEST_SALT_2)
 
-    # Test error when decrypting with wrong iteration number
     def test_wrong_itr_num(self):
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1, TEST_SALT_1, TEST_ITR)
         self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_2, TEST_SALT_2, TEST_ITR - 1)
@@ -246,3 +242,10 @@ class CipherTests(unittest.TestCase):
         TestHelper.encrypt_file(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_MULTIPLE_PWD_1, TEST_SALT_1)
         TestHelper.decrypt_file(TEST_ENC_FILE, TEST_DEC_FILE, TEST_MULTIPLE_PWD_1, TEST_SALT_1)
         TestHelper.compare_files(self, TEST_ZIP_FILE, TEST_DEC_FILE)
+
+    # Test key derivator error
+    def test_key_derivator_error(self):
+        self.assertRaises(ValueError, Pbkdf2Sha512, 0)
+        self.assertRaises(ValueError, Scrypt, 0, 1, 1)
+        self.assertRaises(ValueError, Scrypt, 1, 0, 1)
+        self.assertRaises(ValueError, Scrypt, 1, 1, 0)

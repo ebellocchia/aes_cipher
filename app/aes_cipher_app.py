@@ -27,7 +27,8 @@ import sys
 from enum import Enum, auto, unique
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
-from aes_cipher import FileDecrypter, FileEncrypter, DataHmacError, DataDecryptError
+
+from aes_cipher import DataDecryptError, DataHmacError, FileDecrypter, FileEncrypter
 
 
 #

@@ -96,15 +96,15 @@ A constructor can be added to customize the algorithm.
   - `key_derivator`: key derivator to be used for master key and IV generation, it shall be an instance of the `IKeyDerivator` interface. Default value: `Pbkdf2Sha512Default`.
 - `DataEncrypter.Encrypt(data, passwords [, salts])`: encrypt data with the specified passwords and salts
     - `data`: input data (string or bytes)
-    - `passwords`: single password (string) or multiple passwords (list of strings)
-    - `salts` (optional): single salt (string) or multiple salts (list of strings). The number of salts shall be the same of the passwords. If not specified, salts will be randomly generated (16-byte long).
+    - `passwords`: list of passwords (list of strings)
+    - `salts` (optional): list of salts (list of strings). The number of salts shall be the same of the passwords. If not specified, salts will be randomly generated (16-byte long).
 - `DataEncrypter.GetEncryptedData()`: get encrypted data (bytes)
 
 `FileEncrypter` class: encrypt a file
 
 - `FileEncrypter(key_derivator)`: construct the class
   - `key_derivator`: see `DataEncrypter` constructor
-- `FileEncrypter.Encrypt(file_in, passwords [, salts])`: encrypt file with the specified passwords, salt and iteration number
+- `FileEncrypter.Encrypt(file_in, passwords [, salts])`: encrypt file with the specified passwords and salts
     - `file_in`: input file
     - `passwords`: see `DataEncrypter.Encrypt`
     - `salts`: see `DataEncrypter.Encrypt`
@@ -118,7 +118,7 @@ A constructor can be added to customize the algorithm.
 
 - `DataDecrypter(key_derivator)`: construct the class
   - `key_derivator`: key derivator to be used for master key and IV generation, it shall be an instance of the `IKeyDerivator` interface. Default value: `Pbkdf2Sha512Default`.
-- `DataDecrypter.Decrypt(data, passwords)`: decrypt data with the specified passwords, salt and iteration number
+- `DataDecrypter.Decrypt(data, passwords)`: decrypt data with the specified passwords
     - `data`: input data (string or bytes)
     - `passwords`: see `DataEncrypter.Encrypt`
 - `DataDecrypter.GetDecryptedData()`: get decrypted data (bytes)

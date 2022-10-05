@@ -21,11 +21,6 @@
 #
 # Imports
 #
-from typing import List, Optional, Union
-
-from aes_cipher.data_decrypter import DataDecrypter
-from aes_cipher.file_reader import FileReader
-from aes_cipher.file_writer import FileWriter
 from aes_cipher.logger import Logger
 
 
@@ -33,35 +28,15 @@ from aes_cipher.logger import Logger
 # Classes
 #
 
-# File decrypter class
-class FileDecrypter:
+# Base class for classes that support logging
+class LoggableBase:
 
-    decrypter: DataDecrypter
+    logger: Logger
 
     # Constructor
     def __init__(self) -> None:
-        self.decrypter = DataDecrypter()
+        self.logger = Logger()
 
     # Get logger
     def Logger(self) -> Logger:
-        return self.decrypter.Logger()
-
-    # Decrypt
-    def Decrypt(self,
-                file_in: str,
-                passwords: List[Union[str, bytes]],
-                salt: Optional[Union[str, bytes]] = None,
-                itr_num: Optional[int] = None) -> None:
-        # Read file
-        file_data = FileReader.Read(file_in)
-        # Decrypt it
-        self.decrypter.Decrypt(file_data, passwords, salt, itr_num)
-
-    # Get decrypted data
-    def GetDecryptedData(self) -> bytes:
-        return self.decrypter.GetDecryptedData()
-
-    # Save to file
-    def SaveTo(self,
-               file_out: str) -> None:
-        FileWriter.Write(file_out, self.GetDecryptedData())
+        return self.logger

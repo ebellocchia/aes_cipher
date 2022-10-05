@@ -39,9 +39,12 @@ class FileEncrypter:
     encrypter: DataEncrypter
 
     # Constructor
-    def __init__(self,
-                 logger: Optional[Logger] = None) -> None:
-        self.encrypter = DataEncrypter(logger)
+    def __init__(self) -> None:
+        self.encrypter = DataEncrypter()
+
+    # Get logger
+    def Logger(self) -> Logger:
+        return self.encrypter.Logger()
 
     # Encrypt
     def Encrypt(self,

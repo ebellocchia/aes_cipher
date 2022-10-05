@@ -30,6 +30,7 @@ import logging
 
 # Constant for logger class
 class LoggerConst:
+    LOGGER_NAME: str = "aes_cipher"
     LOG_FORMAT: str = "  LOG %(levelname)s - %(message)s"
 
 
@@ -39,27 +40,25 @@ class Logger:
     logger: logging.Logger
 
     # Constructor
-    def __init__(self,
-                 name: str = "") -> None:
-        self.__CreateLogger(name)
+    def __init__(self) -> None:
+        self.__CreateLogger()
         self.__ConfigureLogger()
-        self.SetVerbose(False)
+
+    # Set level
+    def SetLevel(self,
+                 level: int) -> None:
+        self.logger.setLevel(level)
 
     # Get logger
     def GetLogger(self) -> logging.Logger:
         return self.logger
 
-    # Set verbose
-    def SetVerbose(self,
-                   is_verbose: bool) -> None:
-        self.logger.setLevel(logging.INFO if is_verbose else logging.WARNING)
-
     # Create logger
-    def __CreateLogger(self,
-                       name: str) -> None:
-        self.logger = logging.getLogger(name)
+    def __CreateLogger(self) -> None:
+        self.logger = logging.getLogger(LoggerConst.LOGGER_NAME)
 
     # Configure logger
-    @staticmethod
-    def __ConfigureLogger() -> None:
-        logging.basicConfig(format=LoggerConst.LOG_FORMAT)
+    def __ConfigureLogger(self) -> None:
+        ch = logging.StreamHandler()
+        ch.setFormatter(logging.Formatter(LoggerConst.LOG_FORMAT))
+        self.logger.addHandler(ch)

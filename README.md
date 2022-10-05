@@ -130,7 +130,7 @@ Enable logging:
     data_decrypter = DataDecrypter()
     data_decrypter.Logger().SetLevel(logging.INFO)
 
-## Application
+## Sample Application
 
 A sample application based on the library can be found in the *app* folder.
 

@@ -4,6 +4,8 @@ doc-warnings: true
 member-warnings: true
 
 ignore-paths:
+  - .tox
+  - build
   - tests
 
 ignore-patterns:
@@ -33,12 +35,16 @@ mypy:
     ignore-missing-imports: true
     follow-imports: skip
 
-# pep257 configuration (no docstring in this project)
-pep257:
+# pyroma configuration
+pyroma:
+  run: true
+
+# pydocstyle configuration (no docstring in this project)
+pydocstyle:
   run: false
 
-# pep8 configuration
-pep8:
+# pycodestyle configuration
+pycodestyle:
   disable:
     - N802    # function name should be lowercase
   options:

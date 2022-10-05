@@ -28,6 +28,7 @@ from aes_cipher import (
     DataDecrypter, DataDecryptError, DataEncrypter, DataHmacError, FileDecrypter, FileEncrypter, Pbkdf2Sha512, Scrypt
 )
 from aes_cipher.data_decrypter import DataDecrypterConst
+from aes_cipher.key_iv_generator import KeyIvGeneratorConst
 from aes_cipher.file_reader import FileReader
 from aes_cipher.file_writer import FileWriter
 from aes_cipher.utils import Utils
@@ -44,12 +45,12 @@ TEST_ZIP_FILE = TEST_FILES_PATH / "test_file.zip"
 TEST_DEC_FILE = TEST_FILES_PATH / "dec"
 TEST_ENC_FILE = TEST_FILES_PATH / "enc"
 # Passwords and salts
-TEST_SINGLE_PWD_1 = "test_pwd_1"
-TEST_SINGLE_PWD_2 = "test_pwd_2"
+TEST_SINGLE_PWD_1 = ["test_pwd_1"]
+TEST_SINGLE_PWD_2 = ["test_pwd_2"]
 TEST_MULTIPLE_PWD_1 = ["test_pwd_1", "test_pwd_2", "test_pwd_3"]
 TEST_MULTIPLE_PWD_2 = ["test_pwd_1", "test_pwd_4", "test_pwd_3"]
-TEST_SALT_1 = "test_salt_1"
-TEST_SALT_2 = "test_salt_2"
+TEST_SINGLE_SALT_1 = ["test_salt_1"]
+TEST_MULTIPLE_SALT_1 = ["test_salt_1", "test_salt_2", "test_salt_3"]
 # Input data
 TEST_STR = """Hello,
 This a test string for encrypting/decrypting a string.
@@ -66,30 +67,30 @@ TEST_ITR = 1024 * 16
 class TestHelper:
     # Decrypt data
     @staticmethod
-    def decrypt_data(data, passwords, salt=None, itr_num=TEST_ITR):
+    def decrypt_data(data, passwords, itr_num=TEST_ITR):
         data_decrypter = DataDecrypter(Pbkdf2Sha512(itr_num))
-        data_decrypter.Decrypt(data, passwords, salt)
+        data_decrypter.Decrypt(data, passwords)
         return data_decrypter.GetDecryptedData()
 
     # Encrypt data
     @staticmethod
-    def encrypt_data(data, passwords, salt=None, itr_num=TEST_ITR):
+    def encrypt_data(data, passwords, salts=None, itr_num=TEST_ITR):
         data_encrypter = DataEncrypter(Pbkdf2Sha512(itr_num))
-        data_encrypter.Encrypt(data, passwords, salt)
+        data_encrypter.Encrypt(data, passwords, salts)
         return data_encrypter.GetEncryptedData()
 
     # Decrypt file
     @staticmethod
-    def decrypt_file(file_in, file_out, passwords, salt=None, itr_num=TEST_ITR):
+    def decrypt_file(file_in, file_out, passwords, itr_num=TEST_ITR):
         file_decrypter = FileDecrypter(Pbkdf2Sha512(itr_num))
-        file_decrypter.Decrypt(file_in, passwords, salt)
+        file_decrypter.Decrypt(file_in, passwords)
         file_decrypter.SaveTo(file_out)
 
     # Encrypt file
     @staticmethod
-    def encrypt_file(file_in, file_out, passwords, salt=None, itr_num=TEST_ITR):
+    def encrypt_file(file_in, file_out, passwords, salts=None, itr_num=TEST_ITR):
         file_encrypter = FileEncrypter(Pbkdf2Sha512(itr_num))
-        file_encrypter.Encrypt(file_in, passwords, salt)
+        file_encrypter.Encrypt(file_in, passwords, salts)
         file_encrypter.SaveTo(file_out)
 
     # Compare files
@@ -134,11 +135,13 @@ class CipherTests(unittest.TestCase):
     def test_keyiv_hmac_error(self):
         # Data
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1)
-        enc_data = TestHelper.corrupt_data(enc_data, DataDecrypterConst.INT_KEY_OFF)
+        enc_data = TestHelper.corrupt_data(enc_data,
+                                           DataDecrypterConst.SALT_OFF + KeyIvGeneratorConst.SALT_DEF_SIZE + DataDecrypterConst.INT_KEY_OFF)
         self.assertRaises(DataHmacError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_1)
         # File
         TestHelper.encrypt_file(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
-        TestHelper.corrupt_file(TEST_ENC_FILE, DataDecrypterConst.INT_KEY_OFF)
+        TestHelper.corrupt_file(TEST_ENC_FILE,
+                                DataDecrypterConst.SALT_OFF + KeyIvGeneratorConst.SALT_DEF_SIZE + DataDecrypterConst.INT_KEY_OFF)
         self.assertRaises(DataHmacError, TestHelper.decrypt_file, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
 
     # Test HMAC error for data
@@ -162,14 +165,9 @@ class CipherTests(unittest.TestCase):
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_MULTIPLE_PWD_1)
         self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_MULTIPLE_PWD_2)
 
-    # Test error when decrypting with wrong salt
-    def test_wrong_salt(self):
-        enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1, TEST_SALT_1)
-        self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_2, TEST_SALT_2)
-
     def test_wrong_itr_num(self):
-        enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1, TEST_SALT_1, TEST_ITR)
-        self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_2, TEST_SALT_2, TEST_ITR - 1)
+        enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1, TEST_SINGLE_SALT_1, TEST_ITR)
+        self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_1, TEST_ITR - 1)
 
     # Test basic encryption/decryption with string data
     def test_data_str(self):
@@ -203,8 +201,8 @@ class CipherTests(unittest.TestCase):
 
     # Test encryption/decryption with single password and custom salt (text file as input)
     def test_file_txt_single_pwd_custom_salt(self):
-        TestHelper.encrypt_file(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
-        TestHelper.decrypt_file(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
+        TestHelper.encrypt_file(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SINGLE_SALT_1)
+        TestHelper.decrypt_file(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
         TestHelper.compare_files(self, TEST_TXT_FILE, TEST_DEC_FILE)
 
     # Test encryption/decryption with multiple passwords and default salt (text file as input)
@@ -215,8 +213,8 @@ class CipherTests(unittest.TestCase):
 
     # Test encryption/decryption with multiple passwords and custom salt (text file as input)
     def test_file_txt_multiple_pwd_custom_salt(self):
-        TestHelper.encrypt_file(TEST_TXT_FILE, TEST_ENC_FILE, TEST_MULTIPLE_PWD_1, TEST_SALT_1)
-        TestHelper.decrypt_file(TEST_ENC_FILE, TEST_DEC_FILE, TEST_MULTIPLE_PWD_1, TEST_SALT_1)
+        TestHelper.encrypt_file(TEST_TXT_FILE, TEST_ENC_FILE, TEST_MULTIPLE_PWD_1, TEST_MULTIPLE_SALT_1)
+        TestHelper.decrypt_file(TEST_ENC_FILE, TEST_DEC_FILE, TEST_MULTIPLE_PWD_1)
         TestHelper.compare_files(self, TEST_TXT_FILE, TEST_DEC_FILE)
 
     # Test encryption/decryption with single password and default salt (binary file as input)
@@ -227,8 +225,8 @@ class CipherTests(unittest.TestCase):
 
     # Test encryption/decryption with single password and custom salt (binary file as input)
     def test_file_bin_single_pwd_custom_salt(self):
-        TestHelper.encrypt_file(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
-        TestHelper.decrypt_file(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1, TEST_SALT_1)
+        TestHelper.encrypt_file(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1, TEST_SINGLE_SALT_1)
+        TestHelper.decrypt_file(TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
         TestHelper.compare_files(self, TEST_ZIP_FILE, TEST_DEC_FILE)
 
     # Test encryption/decryption with multiple passwords and default salt (binary file as input)
@@ -239,8 +237,8 @@ class CipherTests(unittest.TestCase):
 
     # Test encryption/decryption with multiple passwords and custom salt (binary file as input)
     def test_file_bin_multiple_pwd_custom_salt(self):
-        TestHelper.encrypt_file(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_MULTIPLE_PWD_1, TEST_SALT_1)
-        TestHelper.decrypt_file(TEST_ENC_FILE, TEST_DEC_FILE, TEST_MULTIPLE_PWD_1, TEST_SALT_1)
+        TestHelper.encrypt_file(TEST_ZIP_FILE, TEST_ENC_FILE, TEST_MULTIPLE_PWD_1, TEST_MULTIPLE_SALT_1)
+        TestHelper.decrypt_file(TEST_ENC_FILE, TEST_DEC_FILE, TEST_MULTIPLE_PWD_1)
         TestHelper.compare_files(self, TEST_ZIP_FILE, TEST_DEC_FILE)
 
     # Test key derivator error

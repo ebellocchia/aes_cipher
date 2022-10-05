@@ -65,6 +65,8 @@ class DataDecrypter(LoggableBase):
         # Log
         if salt is not None:
             self.logger.GetLogger().info(f"Salt: {Utils.DataToString(salt)}")
+        if itr_num is not None:
+            self.logger.GetLogger().info(f"Iterations number: {itr_num}")
 
         # Initialize current data
         curr_data = data

@@ -1,3 +1,14 @@
+# 2.0.0
+
+- Add possibility to use a custom key derivation function
+- Add _Scrypt_ as key derivation function
+- A list of salts are required when encrypting, instead of a single one
+- If not specified, salts are randomly generated instead of using a default one
+- Salts are written to the encrypted file
+- No need to specify salts when decrypting anymore, since they are written in the file
+
+**NOTE:** files or data encrypted with the old version cannot be decrypted with the new one
+
 # 1.0.5
 
 - Fix setting of logging level

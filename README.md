@@ -40,7 +40,10 @@ And then simply run *tox*:
 
     tox
 
-To run tests and get the code coverage and report.
+This will run code coverage with different Python versions and perform style and code analysis.\
+For quick test:
+
+    tox -e unittest
 
 ## APIs
 

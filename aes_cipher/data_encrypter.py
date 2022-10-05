@@ -26,8 +26,11 @@ from typing import List, Optional, Tuple, Union
 
 from aes_cipher.aes_cbc_encrypter import AesCbcEncrypter
 from aes_cipher.hmac_sha256 import HmacSha256
+from aes_cipher.ikey_derivator import IKeyDerivator
 from aes_cipher.key_iv_generator import KeyIvGenerator
 from aes_cipher.loggable_base import LoggableBase
+from aes_cipher.pbkdf2_sha512 import Pbkdf2Sha512Default
+from aes_cipher.salt_length import SaltLength
 from aes_cipher.utils import Utils
 
 
@@ -39,45 +42,48 @@ from aes_cipher.utils import Utils
 class DataEncrypter(LoggableBase):
 
     encrypted_data: bytes
+    key_derivator: IKeyDerivator
 
     # Constructor
-    def __init__(self) -> None:
+    def __init__(self,
+                 key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
         super().__init__()
         self.encrypted_data = b""
+        self.key_derivator = key_derivator
 
     # Encrypt
     def Encrypt(self,
                 data: Union[str, bytes],
                 passwords: List[Union[str, bytes]],
-                salt: Optional[Union[str, bytes]] = None,
-                itr_num: Optional[int] = None) -> None:
-        # Log
-        if salt is not None:
-            self.logger.GetLogger().info(f"Salt: {Utils.DataToString(salt)}")
-        if itr_num is not None:
-            self.logger.GetLogger().info(f"Iterations number: {itr_num}")
+                salts: Optional[List[Union[str, bytes]]] = None) -> None:
+        if salts is not None and len(salts) != len(passwords):
+            raise ValueError("Number of salts shall be the same of passwords")
 
         # Initialize current data
         curr_data = Utils.Encode(data)
 
         # Encrypt multiple times, one for each given password
-        for password in passwords:
+        for i, password in enumerate(passwords):
+            # Generate keys and IVs
+            key_iv_gen = KeyIvGenerator(self.key_derivator)
+            key_iv_gen.GenerateMaster(password, salts[i] if salts is not None else None)
+            key_iv_gen.GenerateInternal()
+
             # Log
             self.logger.GetLogger().info(f"Encrypting with password: {Utils.DataToString(password)}")
             self.logger.GetLogger().info(f"  Current data: {Utils.DataToString(curr_data)}")
 
-            # Generate keys and IVs
-            key_iv_gen = KeyIvGenerator()
-            key_iv_gen.GenerateMaster(password, salt, itr_num)
-            key_iv_gen.GenerateInternal()
-
-            # Process internal key and IV
-            key_iv_encrypted, key_iv_digest = self.__ProcessInternalKeyIv(key_iv_gen)
-            # Process data
-            data_encrypted, data_digest = self.__ProcessData(curr_data, key_iv_gen)
+            # Process salt
+            salt, salt_enc_len = self.__ProcessSalt(key_iv_gen)
+            # Encrypt internal key and IV
+            key_iv_encrypted, key_iv_digest = self.__EncryptInternalKeyIv(key_iv_gen)
+            # Encrypt data
+            data_encrypted, data_digest = self.__EncryptData(curr_data, key_iv_gen)
 
             # Write to buffer
             data_buffer = io.BytesIO()
+            data_buffer.write(salt_enc_len)
+            data_buffer.write(salt)
             data_buffer.write(key_iv_encrypted)
             data_buffer.write(key_iv_digest)
             data_buffer.write(data_encrypted)
@@ -95,16 +101,30 @@ class DataEncrypter(LoggableBase):
     def GetEncryptedData(self) -> bytes:
         return self.encrypted_data
 
-    # Process internal key and IV
-    def __ProcessInternalKeyIv(self,
+    # Process salt
+    def __ProcessSalt(self,
+                      key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
+        # Get salt and its encoded length
+        salt = key_iv_gen.GetSalt()
+        salt_enc_len = SaltLength.EncodeLength(salt)
+        # Log
+        self.logger.GetLogger().info(f"  Salt: {Utils.DataToString(salt)}")
+        self.logger.GetLogger().info(f"  Salt encoded length: {Utils.BytesToHexStr(salt_enc_len)}")
+
+        return salt, salt_enc_len
+
+    # Encrypt internal key and IV
+    def __EncryptInternalKeyIv(self,
                                key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
         # Encrypt internal key and IV with master key and IV
         aes_encrypter = AesCbcEncrypter(key_iv_gen.GetMasterKey(), key_iv_gen.GetMasterIV())
         aes_encrypter.Encrypt(key_iv_gen.GetInternalKey() + key_iv_gen.GetInternalIV())
         key_iv_encrypted = aes_encrypter.GetEncryptedData()
-        # Compute their digest
-        key_iv_digest = HmacSha256.QuickDigest(key_iv_gen.GetMasterKey(),
-                                               key_iv_gen.GetInternalKey() + key_iv_gen.GetInternalIV())
+        # Compute digest
+        key_iv_digest = HmacSha256.QuickDigest(
+            key_iv_gen.GetMasterKey(),
+            key_iv_gen.GetInternalKey() + key_iv_gen.GetInternalIV()
+        )
 
         # Log
         self.logger.GetLogger().info(f"  Encrypted internal key/IV: {Utils.BytesToHexStr(key_iv_encrypted)}")
@@ -112,15 +132,15 @@ class DataEncrypter(LoggableBase):
 
         return key_iv_encrypted, key_iv_digest
 
-    # Process data
-    def __ProcessData(self,
+    # Encrypt data
+    def __EncryptData(self,
                       data: Union[str, bytes],
                       key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
         # Encrypt data with internal key and IV
         aes_encrypter = AesCbcEncrypter(key_iv_gen.GetInternalKey(), key_iv_gen.GetInternalIV())
         aes_encrypter.Encrypt(data)
         data_encrypted = aes_encrypter.GetEncryptedData()
-        # Compute its digest
+        # Compute digest
         data_digest = HmacSha256.QuickDigest(key_iv_gen.GetInternalKey(), data)
 
         # Log

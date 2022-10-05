@@ -26,7 +26,9 @@ from typing import List, Optional, Union
 from aes_cipher.data_encrypter import DataEncrypter
 from aes_cipher.file_reader import FileReader
 from aes_cipher.file_writer import FileWriter
+from aes_cipher.ikey_derivator import IKeyDerivator
 from aes_cipher.logger import Logger
+from aes_cipher.pbkdf2_sha512 import Pbkdf2Sha512Default
 
 
 #
@@ -39,8 +41,9 @@ class FileEncrypter:
     encrypter: DataEncrypter
 
     # Constructor
-    def __init__(self) -> None:
-        self.encrypter = DataEncrypter()
+    def __init__(self,
+                 key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
+        self.encrypter = DataEncrypter(key_derivator)
 
     # Get logger
     def Logger(self) -> Logger:
@@ -50,12 +53,11 @@ class FileEncrypter:
     def Encrypt(self,
                 file_in: str,
                 passwords: List[Union[str, bytes]],
-                salt: Optional[Union[str, bytes]] = None,
-                itr_num: Optional[int] = None) -> None:
+                salts: Optional[List[Union[str, bytes]]] = None) -> None:
         # Read file
         file_data = FileReader.Read(file_in)
         # Encrypt it
-        self.encrypter.Encrypt(file_data, passwords, salt, itr_num)
+        self.encrypter.Encrypt(file_data, passwords, salts)
 
     # Get encrypted data
     def GetEncryptedData(self) -> bytes:

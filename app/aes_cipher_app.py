@@ -28,7 +28,7 @@ from enum import Enum, auto, unique
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from aes_cipher import DataDecryptError, DataHmacError, FileDecrypter, FileEncrypter
+from aes_cipher import DataDecryptError, DataHmacError, FileDecrypter, FileEncrypter, Pbkdf2Sha512
 
 
 #
@@ -118,7 +118,7 @@ class ArgumentsParser:
             "-p", "--password",
             type=lambda v: v.split(","),
             required=True,
-            help="password used for encrypting/decrypting (single password or comma-separated list of passwords)"
+            help="passwords used for encrypting/decrypting (single password or comma-separated list of passwords)"
         )
         required.add_argument(
             "-i", "--input",
@@ -134,9 +134,10 @@ class ArgumentsParser:
         )
         optional.add_argument(
             "-s", "--salt",
-            default="",
-            type=str,
-            help="specify a custom salt for master key and IV derivation, default value: []=?AeS_CiPhEr><()"
+            default=None,
+            type=lambda v: v.split(","),
+            help="custom salts for master key and IV derivation, random generated if not specified "
+                 "(only for encrypting)"
         )
         optional.add_argument(
             "-t", "--iteration",
@@ -187,14 +188,16 @@ def EncryptFile(in_file: str,
                 args: Arguments) -> None:
     print(f"Encrypting file: '{in_file}'...")
 
-    file_encrypter = FileEncrypter()
+    file_encrypter = FileEncrypter(
+        Pbkdf2Sha512(args.GetValue(ArgumentTypes.ITR_NUM))
+    )
     if args.IsVerbose():
         file_encrypter.Logger().SetLevel(logging.INFO)
     file_encrypter.Encrypt(
         in_file,
         args.GetValue(ArgumentTypes.PASSWORDS),
-        args.GetValue(ArgumentTypes.SALT),
-        args.GetValue(ArgumentTypes.ITR_NUM))
+        args.GetValue(ArgumentTypes.SALT)
+    )
     file_encrypter.SaveTo(out_path)
 
     print(f"Output file saved to: '{out_path}'")
@@ -207,14 +210,15 @@ def DecryptFile(in_file: str,
     print(f"Decrypting file: '{in_file}'...")
 
     try:
-        file_decrypter = FileDecrypter()
+        file_decrypter = FileDecrypter(
+            Pbkdf2Sha512(args.GetValue(ArgumentTypes.ITR_NUM))
+        )
         if args.IsVerbose():
             file_decrypter.Logger().SetLevel(logging.INFO)
         file_decrypter.Decrypt(
             in_file,
-            args.GetValue(ArgumentTypes.PASSWORDS),
-            args.GetValue(ArgumentTypes.SALT),
-            args.GetValue(ArgumentTypes.ITR_NUM))
+            args.GetValue(ArgumentTypes.PASSWORDS)
+        )
         file_decrypter.SaveTo(out_path)
 
         print(f"Output file saved to: '{out_path}'")

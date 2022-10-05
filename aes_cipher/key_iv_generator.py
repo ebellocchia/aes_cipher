@@ -25,7 +25,8 @@ import os
 from typing import Optional, Union
 
 from aes_cipher.aes_const import AesConst
-from aes_cipher.pbkdf2_sha512 import Pbkdf2Sha512
+from aes_cipher.ikey_derivator import IKeyDerivator
+from aes_cipher.utils import Utils
 
 
 #
@@ -34,42 +35,41 @@ from aes_cipher.pbkdf2_sha512 import Pbkdf2Sha512
 
 # Constants for Key and IV generator class
 class KeyIvGeneratorConst:
-    # Default iterations number
-    DEF_ITR_NUM: int = 1024 * 512
-    # Default salt
-    DEF_SALT: bytes = b"[]=?AeS_CiPhEr><()"
+    # Default salt size
+    SALT_DEF_SIZE: int = 16
 
 
 # Key and IV generator class
 class KeyIvGenerator:
 
-    master_key: bytes
-    master_iv: bytes
+    key_derivator: IKeyDerivator
     internal_key: bytes
     internal_iv: bytes
+    master_key: bytes
+    master_iv: bytes
+    salt: bytes
 
     # Constructor
-    def __init__(self) -> None:
-        self.master_key = b""
-        self.master_iv = b""
+    def __init__(self,
+                 key_derivator: IKeyDerivator) -> None:
+        self.key_derivator = key_derivator
         self.internal_key = b""
         self.internal_iv = b""
+        self.master_key = b""
+        self.master_iv = b""
+        self.bytes = b""
 
     # Generate master key and IV from password
     def GenerateMaster(self,
                        password: Union[str, bytes],
-                       salt: Optional[Union[str, bytes]],
-                       itr_num: Optional[int]) -> None:
-        itr_num = KeyIvGeneratorConst.DEF_ITR_NUM if itr_num is None else itr_num
-        if itr_num <= 0:
-            raise ValueError(f"Invalid iteration number ({itr_num})")
+                       salt: Optional[Union[str, bytes]] = None) -> None:
+        # Generate salt if needed
+        self.salt = Utils.Encode(salt) if salt is not None else os.urandom(KeyIvGeneratorConst.SALT_DEF_SIZE)
 
-        salt = KeyIvGeneratorConst.DEF_SALT if salt is None else salt
-
-        # Compute master key and IV from PBKDF2-SHA512
-        kdf = Pbkdf2Sha512.DeriveKey(password, salt, itr_num)
-        self.master_key = kdf[:AesConst.KeySize()]
-        self.master_iv = kdf[AesConst.KeySize(): AesConst.KeySize() + AesConst.IvSize()]
+        # Compute master key and IV
+        der_key = self.key_derivator.DeriveKey(password, self.salt)
+        self.master_key = der_key[:AesConst.KeySize()]
+        self.master_iv = der_key[AesConst.KeySize(): AesConst.KeySize() + AesConst.IvSize()]
 
     # Generate internal key and IV
     def GenerateInternal(self) -> None:
@@ -92,3 +92,6 @@ class KeyIvGenerator:
     # Get internal IV
     def GetInternalIV(self) -> bytes:
         return self.internal_iv
+
+    def GetSalt(self) -> bytes:
+        return self.salt

@@ -19,46 +19,28 @@
 # THE SOFTWARE.
 
 #
-# Imports
-#
-from typing import Union
-
-from Crypto.Hash import SHA512
-from Crypto.Protocol.KDF import PBKDF2
-
-from aes_cipher.aes_const import AesConst
-from aes_cipher.ikey_derivator import IKeyDerivator
-from aes_cipher.utils import Utils
-
-
-#
 # Classes
 #
 
-# PBKDF2-SHA512 class
-class Pbkdf2Sha512(IKeyDerivator):
-
-    itr_num: int
-
-    # Constructor
-    def __init__(self,
-                 itr_num: int) -> None:
-        if itr_num <= 0:
-            raise ValueError(f"Invalid iteration number ({itr_num})")
-        self.itr_num = itr_num
-
-    # Derive key
-    def DeriveKey(self,
-                  password: Union[str, bytes],
-                  salt: Union[str, bytes]) -> bytes:
-        return PBKDF2(
-            Utils.Decode(password),
-            Utils.Encode(salt),
-            AesConst.KeySize() + AesConst.IvSize(),
-            self.itr_num,
-            hmac_hash_module=SHA512
-        )
+# Constant for salt length class
+class SaltLengthConst:
+    # Salt length size
+    SALT_LEN_SIZE: int = 4
 
 
-# Default class
-Pbkdf2Sha512Default = Pbkdf2Sha512(512 * 1024)
+# Salt length class
+class SaltLength:
+    # Get encoded length size
+    @staticmethod
+    def EncodedLengthSize() -> int:
+        return SaltLengthConst.SALT_LEN_SIZE
+
+    # Decode length
+    @staticmethod
+    def DecodeLength(salt_len_bytes: bytes) -> int:
+        return int.from_bytes(salt_len_bytes, "big")
+
+    # Encode length
+    @staticmethod
+    def EncodeLength(salt: bytes) -> bytes:
+        return len(salt).to_bytes(SaltLengthConst.SALT_LEN_SIZE, "big")

@@ -21,48 +21,50 @@
 #
 # Imports
 #
-from typing import List, Union
+from typing import Union
 
-from aes_cipher.data_decrypter import DataDecrypter
-from aes_cipher.file_reader import FileReader
-from aes_cipher.file_writer import FileWriter
+from Crypto.Protocol.KDF import scrypt
+
+from aes_cipher.aes_const import AesConst
 from aes_cipher.ikey_derivator import IKeyDerivator
-from aes_cipher.logger import Logger
-from aes_cipher.pbkdf2_sha512 import Pbkdf2Sha512Default
+from aes_cipher.utils import Utils
 
 
 #
 # Classes
 #
 
-# File decrypter class
-class FileDecrypter:
+# Scrypt class
+class Scrypt(IKeyDerivator):
 
-    decrypter: DataDecrypter
+    n: int
+    r: int
+    p: int
 
     # Constructor
     def __init__(self,
-                 key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
-        self.decrypter = DataDecrypter(key_derivator)
+                 n: int,
+                 r: int,
+                 p: int) -> None:
+        if n <= 0 or r <= 0 or p <= 0:
+            raise ValueError(f"Invalid scrypt parameters ({n}, {r}, {p})")
+        self.n = n
+        self.r = r
+        self.p = p
 
-    # Get logger
-    def Logger(self) -> Logger:
-        return self.decrypter.Logger()
+    # Derive key
+    def DeriveKey(self,
+                  password: Union[str, bytes],
+                  salt: Union[str, bytes]) -> bytes:
+        return scrypt(
+            Utils.Decode(password),     # type: ignore
+            Utils.Encode(salt),         # type: ignore
+            key_len=AesConst.KeySize() + AesConst.IvSize(),
+            N=self.n,
+            r=self.r,
+            p=self.p
+        )
 
-    # Decrypt
-    def Decrypt(self,
-                file_in: str,
-                passwords: List[Union[str, bytes]]) -> None:
-        # Read file
-        file_data = FileReader.Read(file_in)
-        # Decrypt it
-        self.decrypter.Decrypt(file_data, passwords)
 
-    # Get decrypted data
-    def GetDecryptedData(self) -> bytes:
-        return self.decrypter.GetDecryptedData()
-
-    # Save to file
-    def SaveTo(self,
-               file_out: str) -> None:
-        FileWriter.Write(file_out, self.GetDecryptedData())
+# Default class
+ScryptDefault = Scrypt(16384, 8, 8)

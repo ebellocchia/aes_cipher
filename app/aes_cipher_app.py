@@ -21,7 +21,7 @@
 #
 # Imports
 #
-import getopt
+import argparse
 import logging
 import sys
 from enum import Enum, auto, unique
@@ -44,7 +44,6 @@ class ArgumentTypes(Enum):
     SALT = auto(),
     ITR_NUM = auto(),
     VERBOSE = auto(),
-    HELP = auto(),
 
 
 # Arguments
@@ -70,28 +69,11 @@ class Arguments:
                  arg_type: ArgumentTypes) -> None:
         if not isinstance(arg_type, ArgumentTypes):
             raise TypeError("Invalid argument type")
-
-        if arg_type == ArgumentTypes.PASSWORDS:
-            self.args_val[arg_type] = value.split(",")
-        elif arg_type == ArgumentTypes.INPUT_PATHS:
-            self.args_val[arg_type] = self.__ParseInputPaths(value)
-        elif arg_type == ArgumentTypes.OUTPUT_PATH:
-            self.args_val[arg_type] = Path(value)
-        elif arg_type == ArgumentTypes.ITR_NUM:
-            try:
-                self.args_val[arg_type] = int(value)
-            except ValueError:
-                self.args_val[arg_type] = 0
-        else:
-            self.args_val[arg_type] = value
+        self.args_val[arg_type] = value
 
     # Get if verbose
     def IsVerbose(self) -> bool:
         return self.GetValue(ArgumentTypes.VERBOSE)
-
-    # Get if help is needed
-    def IsHelpNeeded(self) -> bool:
-        return self.GetValue(ArgumentTypes.HELP)
 
     # Get if decrypt mode
     def IsDecryptMode(self) -> bool:
@@ -100,17 +82,6 @@ class Arguments:
     # Get if encrypt mode
     def IsEncryptMode(self) -> bool:
         return self.GetValue(ArgumentTypes.MODE) == self.MODES[1]
-
-    # Get if arguments are valid
-    def AreValid(self) -> bool:
-        return ((self.GetValue(ArgumentTypes.MODE) in self.MODES) and
-                (self.GetValue(ArgumentTypes.PASSWORDS) != "") and
-                (self.GetValue(ArgumentTypes.INPUT_PATHS) is not None) and
-                (self.GetValue(ArgumentTypes.OUTPUT_PATH) is not None) and
-                (
-                 (self.GetValue(ArgumentTypes.ITR_NUM) is None) or
-                 (self.GetValue(ArgumentTypes.ITR_NUM) > 0)
-                ))
 
     # Reset
     def Reset(self) -> None:
@@ -122,10 +93,78 @@ class Arguments:
             ArgumentTypes.SALT: None,
             ArgumentTypes.ITR_NUM: None,
             ArgumentTypes.VERBOSE: False,
-            ArgumentTypes.HELP: False,
         }
 
-    # Parse input files
+
+# Argument parser
+class ArgumentsParser:
+
+    parser: argparse.ArgumentParser
+
+    # Constructor
+    def __init__(self) -> None:
+        self.parser = argparse.ArgumentParser()
+        required = self.parser.add_argument_group("required arguments")
+        optional = self.parser.add_argument_group("optional arguments")
+        required.add_argument(
+            "-m", "--mode",
+            choices=["dec", "enc"],
+            type=str,
+            required=True,
+            help="operation mode"
+        )
+        required.add_argument(
+            "-p", "--password",
+            type=lambda v: v.split(","),
+            required=True,
+            help="password used for encrypting/decrypting (single password or a list of comma-separated passwords)"
+        )
+        required.add_argument(
+            "-i", "--input",
+            type=lambda v: self.__ParseInputPaths(v),
+            required=True,
+            help="input to be encrypted/decrypted, it can be a single file, a list of files separated by a comma or a folder"
+        )
+        required.add_argument(
+            "-o", "--output",
+            type=lambda v: Path(v),
+            required=True,
+            help="output folder where the encrypted/decrypted files will be saved"
+        )
+        optional.add_argument(
+            "-s", "--salt",
+            default="",
+            type=str,
+            help="specify a custom salt for master key and IV derivation, default value: []=?AeS_CiPhEr><()"
+        )
+        optional.add_argument(
+            "-t", "--iteration",
+            default=524288,
+            type=int,
+            help="specify the number of iteration for PBKDF2-SHA512 algorithm, default value: 524288"
+        )
+        optional.add_argument(
+            "-v", "--verbose",
+            help="enable verbose mode",
+            action="store_true"
+        )
+
+    # Parse arguments
+    def Parse(self) -> Arguments:
+        parsed_args = self.parser.parse_args()
+
+        args = Arguments()
+        args.SetValue(parsed_args.mode.lower(), ArgumentTypes.MODE)
+        args.SetValue(parsed_args.password, ArgumentTypes.PASSWORDS)
+        args.SetValue(parsed_args.input, ArgumentTypes.INPUT_PATHS)
+        args.SetValue(parsed_args.output, ArgumentTypes.OUTPUT_PATH)
+        args.SetValue(parsed_args.salt, ArgumentTypes.SALT)
+        args.SetValue(parsed_args.iteration, ArgumentTypes.ITR_NUM)
+        args.SetValue(parsed_args.verbose, ArgumentTypes.VERBOSE)
+
+        return args
+
+    # Parse input paths
     @staticmethod
     def __ParseInputPaths(value: str) -> List[Path]:
         curr_path = Path(value)
@@ -137,77 +176,9 @@ class Arguments:
         return files
 
 
-# Argument parser
-class ArgumentsParser:
-
-    args: Arguments
-
-    # Constructor
-    def __init__(self) -> None:
-        self.args = Arguments()
-
-    # Parse arguments
-    def Parse(self,
-              argv: List[str]) -> None:
-        # Reset arguments
-        self.args.Reset()
-
-        # Parse arguments
-        try:
-            opts, _ = getopt.getopt(argv, "m:p:i:o:s:t:vh", ["mode=", "password=", "input=", "output=", "salt=", "iteration=", "verbose", "help"])
-        # Handle error
-        except getopt.GetoptError:
-            return
-
-        # Get arguments
-        for opt, arg in opts:
-            if opt in ("-m", "--mode"):
-                self.args.SetValue(arg.lower(), ArgumentTypes.MODE)
-            elif opt in ("-p", "--password"):
-                self.args.SetValue(arg, ArgumentTypes.PASSWORDS)
-            elif opt in ("-i", "--input"):
-                self.args.SetValue(arg, ArgumentTypes.INPUT_PATHS)
-            elif opt in ("-o", "--output"):
-                self.args.SetValue(arg, ArgumentTypes.OUTPUT_PATH)
-            elif opt in ("-s", "--salt"):
-                self.args.SetValue(arg, ArgumentTypes.SALT)
-            elif opt in ("-t", "--iteration"):
-                self.args.SetValue(arg, ArgumentTypes.ITR_NUM)
-            elif opt in ("-v", "--verbose"):
-                self.args.SetValue(True, ArgumentTypes.VERBOSE)
-            elif opt in ("-h", "--help"):
-                self.args.SetValue(True, ArgumentTypes.HELP)
-
-    # Get arguments
-    def GetArguments(self) -> Arguments:
-        return self.args
-
-
 #
 # Functions
 #
-
-# Print usage
-def PrintUsage() -> None:
-    usage_str = """
-Description:
-    Simple utility for encrypting/decrypting files using AES256-CBC.
-
-Usage:
-    Encrypt: aes_cipher_app.py -m enc -p <PASSWORDS> -i <INPUT_FILE_OR_DIRECTORY> -o <OUTPUT_DIRECTORY> [-s <SALT>] [-t <ITR_NUM>] [-v]
-    Decrypt: aes_cipher_app.py -m dec -p <PASSWORDS> -i <INPUT_FILE_OR_DIRECTORY> -o <OUTPUT_DIRECTORY> [-s <SALT>] [-t <ITR_NUM>] [-v]
-
-Parameters:
-    -m, --mode : operation mode, enc for encrypting, dec for decrypting.
-    -p, --password : password used for encrypting/decrypting. It can be a single password or a list of passwords separated by a comma.
-    -i, --input : input to be encrypted/decrypted. It can be a single file, a list of files separated by a comma or a folder (in this case all files in the folder will be encrypted/decrypted).
-    -o, --output : output folder where the encrypted/decrypted files will be saved.
-    -s, --salt : (optional) specify a custom salt for master key and IV derivation, otherwise the default salt "[]=?AeS_CiPhEr><()" will be used.
-    -t, --iteration : (optional) specify the number of iteration for algorithm, otherwise the default value 524288 will be used.
-    -v, --verbose : (optional) enable verbose mode.
-"""
-    print(usage_str)
-
 
 # Run application
 def RunApp(args: Arguments) -> None:
@@ -271,31 +242,17 @@ def RunApp(args: Arguments) -> None:
             except DataDecryptError:
                 print("ERROR: unable to decrypt file '%s'" % curr_path)
 
-    # Output text
     print("Operation completed")
 
 
 # Main
-def main(argv: List[str]) -> None:
+def main() -> None:
     # Get arguments
     args_parser = ArgumentsParser()
-    args_parser.Parse(argv)
-    args = args_parser.GetArguments()
-
-    # Check arguments
-    if not args.AreValid():
-        PrintUsage()
-        sys.exit(1)
-
-    # Print help if needed
-    if args.IsHelpNeeded():
-        PrintUsage()
-        sys.exit(0)
-
     # Run application
-    RunApp(args)
+    RunApp(args_parser.Parse())
 
 
 # Execute main
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

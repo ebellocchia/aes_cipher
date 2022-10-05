@@ -25,12 +25,13 @@ import unittest
 from pathlib import Path
 
 from aes_cipher import (
-    DataDecrypter, DataDecryptError, DataEncrypter, DataHmacError, FileDecrypter, FileEncrypter, Pbkdf2Sha512, Scrypt, Logger
+    DataDecrypter, DataDecryptError, DataEncrypter, DataHmacError, FileDecrypter, FileEncrypter, Logger, Pbkdf2Sha512,
+    Scrypt
 )
 from aes_cipher.data_decrypter import DataDecrypterConst
-from aes_cipher.key_iv_generator import KeyIvGeneratorConst
 from aes_cipher.file_reader import FileReader
 from aes_cipher.file_writer import FileWriter
+from aes_cipher.key_iv_generator import KeyIvGeneratorConst
 from aes_cipher.utils import Utils
 
 

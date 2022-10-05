@@ -41,15 +41,17 @@ from aes_cipher.utils import Utils
 
 # Constants for data decrypter
 class DataDecrypterConst:
-    # Data offsets
+    # Salt offsets (relative to the beginning of data)
     SALT_LEN_OFF: int = 0
     SALT_OFF: int = SaltLength.EncodedLengthSize()
 
+    # Internal key/IV offsets (relative to the end of salt information)
     INT_KEY_OFF: int = 0
     INT_IV_OFF: int = AesConst.KeySize()
     INT_KEY_IV_PAD_OFF: int = AesConst.KeySize() + AesConst.IvSize()
     INT_KEY_IV_DIG_OFF: int = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize()
 
+    # Data offsets (relative to the end of salt information)
     DATA_ENC_OFF: int = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize() + HmacSha256.DigestSize()
     DATA_DIG_OFF: int = -1 * HmacSha256.DigestSize()
 

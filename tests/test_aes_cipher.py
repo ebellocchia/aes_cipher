@@ -25,7 +25,7 @@ import unittest
 from pathlib import Path
 
 from aes_cipher import (
-    DataDecrypter, DataDecryptError, DataEncrypter, DataHmacError, FileDecrypter, FileEncrypter, Pbkdf2Sha512, Scrypt
+    DataDecrypter, DataDecryptError, DataEncrypter, DataHmacError, FileDecrypter, FileEncrypter, Pbkdf2Sha512, Scrypt, Logger
 )
 from aes_cipher.data_decrypter import DataDecrypterConst
 from aes_cipher.key_iv_generator import KeyIvGeneratorConst
@@ -165,9 +165,9 @@ class CipherTests(unittest.TestCase):
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_MULTIPLE_PWD_1)
         self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_MULTIPLE_PWD_2)
 
-    def test_wrong_itr_num(self):
-        enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1, TEST_SINGLE_SALT_1, TEST_ITR)
-        self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_1, TEST_ITR - 1)
+    # Test error when encrypting with wrong salts length
+    def test_wrong_salt_num(self):
+        self.assertRaises(ValueError, TestHelper.encrypt_data, TEST_STR, TEST_MULTIPLE_PWD_1, TEST_SINGLE_SALT_1)
 
     # Test basic encryption/decryption with string data
     def test_data_str(self):
@@ -247,3 +247,15 @@ class CipherTests(unittest.TestCase):
         self.assertRaises(ValueError, Scrypt, 0, 1, 1)
         self.assertRaises(ValueError, Scrypt, 1, 0, 1)
         self.assertRaises(ValueError, Scrypt, 1, 1, 0)
+
+    # Test logger
+    def test_logger(self):
+        data_dec = DataDecrypter()
+        data_enc = DataEncrypter()
+        self.assertTrue(isinstance(data_dec.Logger(), Logger))
+        self.assertTrue(isinstance(data_enc.Logger(), Logger))
+
+        file_dec = FileDecrypter()
+        file_enc = FileEncrypter()
+        self.assertTrue(isinstance(file_dec.Logger(), Logger))
+        self.assertTrue(isinstance(file_enc.Logger(), Logger))

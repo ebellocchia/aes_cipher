@@ -67,7 +67,7 @@ class KeyIvGenerator:
         salt = KeyIvGeneratorConst.DEF_SALT if salt is None else salt
 
         # Compute master key and IV from PBKDF2-SHA512
-        kdf = Pbkdf2Sha512.Compute(password, salt, itr_num)
+        kdf = Pbkdf2Sha512.DeriveKey(password, salt, itr_num)
         self.master_key = kdf[:AesConst.KeySize()]
         self.master_iv = kdf[AesConst.KeySize(): AesConst.KeySize() + AesConst.IvSize()]
 

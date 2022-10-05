@@ -35,11 +35,11 @@ from aes_cipher.utils import Utils
 
 # PBKDF2-SHA512 class
 class Pbkdf2Sha512:
-    # Compute
+    # Derive key
     @staticmethod
-    def Compute(password: Union[str, bytes],
-                salt: Union[str, bytes],
-                itr_num: int) -> bytes:
+    def DeriveKey(password: Union[str, bytes],
+                  salt: Union[str, bytes],
+                  itr_num: int) -> bytes:
         return PBKDF2(
             Utils.Decode(password),
             Utils.Encode(salt),

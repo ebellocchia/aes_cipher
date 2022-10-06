@@ -132,17 +132,32 @@ class CipherTests(unittest.TestCase):
         if os.path.exists(TEST_DEC_FILE):
             os.remove(TEST_DEC_FILE)
 
+    # Test salt error
+    def test_salt_error(self):
+        # Data
+        enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1)
+        enc_data = TestHelper.corrupt_data(enc_data, DataDecrypterConst.SALT_OFF)
+        self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_1)
+        # File
+        TestHelper.encrypt_file(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
+        TestHelper.corrupt_file(TEST_ENC_FILE, DataDecrypterConst.SALT_OFF)
+        self.assertRaises(DataDecryptError, TestHelper.decrypt_file, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
+
     # Test HMAC error for key/IV
     def test_keyiv_hmac_error(self):
         # Data
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1)
-        enc_data = TestHelper.corrupt_data(enc_data,
-                                           DataDecrypterConst.SALT_OFF + KeyIvGeneratorConst.SALT_DEF_SIZE + DataDecrypterConst.INT_KEY_OFF)
+        enc_data = TestHelper.corrupt_data(
+            enc_data,
+            DataDecrypterConst.SALT_OFF + KeyIvGeneratorConst.SALT_DEF_SIZE + DataDecrypterConst.INT_KEY_OFF
+        )
         self.assertRaises(DataHmacError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_1)
         # File
         TestHelper.encrypt_file(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
-        TestHelper.corrupt_file(TEST_ENC_FILE,
-                                DataDecrypterConst.SALT_OFF + KeyIvGeneratorConst.SALT_DEF_SIZE + DataDecrypterConst.INT_KEY_OFF)
+        TestHelper.corrupt_file(
+            TEST_ENC_FILE,
+            DataDecrypterConst.SALT_OFF + KeyIvGeneratorConst.SALT_DEF_SIZE + DataDecrypterConst.INT_KEY_OFF
+        )
         self.assertRaises(DataHmacError, TestHelper.decrypt_file, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
 
     # Test HMAC error for data

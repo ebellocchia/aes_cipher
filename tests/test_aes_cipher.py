@@ -116,7 +116,7 @@ class TestHelper:
             data_tmp[idx] = 0 if data_tmp[idx] != 0 else 1
             data = bytes(data_tmp)
         elif isinstance(data, str):
-            data[idx] = "0" if data[idx] != "0" else "1"
+            data = data[:idx] + ("0" if data[idx] != "0" else "1") + data[idx + 1:]
 
         return data
 

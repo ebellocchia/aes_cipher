@@ -23,7 +23,7 @@ AES cipher is a library to encrypt/decrypt using AES256-CBC. It is possible to e
 4. HMAC-SHA256 of the encrypted key/IV and file data is computed to ensure integrity, using the master key as key
 
 It is possible to specify either a single password or a list of passwords.
-In the last case, the file will be encrypted multiple times with a different password each time.
+In the last case, the file will be encrypted multiple times with a different password and salt each time.
 
 ## Installation
 

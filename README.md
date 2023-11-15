@@ -1,8 +1,7 @@
 # AES Cipher
 [![PyPI version](https://badge.fury.io/py/aes-cipher.svg)](https://badge.fury.io/py/aes-cipher)
-[![Build Status](https://www.travis-ci.com/ebellocchia/aes_cipher.svg?branch=main)](https://travis-ci.com/ebellocchia/aes_cipher)
 [![codecov](https://codecov.io/gh/ebellocchia/aes_cipher/branch/main/graph/badge.svg)](https://codecov.io/gh/ebellocchia/aes_cipher)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/9afd9788aa0e43faa491edcf6ed29d5e)](https://www.codacy.com/gh/ebellocchia/aes_cipher/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ebellocchia/aes_cipher&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/9afd9788aa0e43faa491edcf6ed29d5e)](https://app.codacy.com/gh/ebellocchia/aes_cipher/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/ebellocchia/aes_cipher/badge)](https://www.codefactor.io/repository/github/ebellocchia/aes_cipher)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/ebellocchia/bip_utils/master/LICENSE)
 

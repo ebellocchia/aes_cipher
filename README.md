@@ -17,7 +17,7 @@ AES cipher is a library to encrypt/decrypt using AES256-CBC. It is possible to e
 
     Alternatively, it can also be customized by the user by simply implementing the `IKeyDerivator` interface.\
     Salt is randomly generated (16-byte long) if not specified.
-2. A random key and IV are generated and used to encrypt the actual data. In this way, if the same file is encrypted with the same password multiple times, the encrypted file will always be different. 
+2. A random key and IV are generated and used to encrypt the actual data. In this way, if the same file is encrypted with the same password multiple times, the encrypted file will always be different.
 3. The random key and IV are encrypted with the master key and IV
 4. HMAC-SHA256 of the encrypted key/IV and file data is computed to ensure integrity, using the master key as key
 
@@ -26,7 +26,8 @@ In the last case, the file will be encrypted multiple times with a different pas
 
 ## Installation
 
-The package requires Python >= 3.7.\
+The package requires Python >= 3.7.
+
 To install it:
 - Using *setuptools*:
 

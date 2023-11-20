@@ -37,22 +37,20 @@ To install it:
 
         pip install aes_cipher
 
+## Test and Coverage
+
+Install develop dependencies:
+
+    pip install -r requirements-dev.txt
+
 To run tests:
 
     python -m unittest discover
 
-Or you can install *tox*:
+To run tests with coverage:
 
-    pip install tox
-
-And then simply run *tox*:
-
-    tox
-
-This will run code coverage with different Python versions and perform style and code analysis.\
-For quick test:
-
-    tox -e unittest
+    coverage run -m unittest discover
+    coverage report
 
 ## APIs
 

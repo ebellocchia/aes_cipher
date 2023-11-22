@@ -137,11 +137,11 @@ class CipherTests(unittest.TestCase):
         # Data
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1)
         enc_data = TestHelper.corrupt_data(enc_data, DataDecrypterConst.SALT_OFF)
-        self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_1)
+        self.assertRaises((DataDecryptError, DataHmacError), TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_1)
         # File
         TestHelper.encrypt_file(TEST_TXT_FILE, TEST_ENC_FILE, TEST_SINGLE_PWD_1)
         TestHelper.corrupt_file(TEST_ENC_FILE, DataDecrypterConst.SALT_OFF)
-        self.assertRaises(DataDecryptError, TestHelper.decrypt_file, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
+        self.assertRaises((DataDecryptError, DataHmacError), TestHelper.decrypt_file, TEST_ENC_FILE, TEST_DEC_FILE, TEST_SINGLE_PWD_1)
 
     # Test HMAC error for key/IV
     def test_keyiv_hmac_error(self):

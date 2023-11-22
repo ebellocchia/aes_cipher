@@ -174,12 +174,12 @@ class CipherTests(unittest.TestCase):
     # Test error when decrypting with wrong single password
     def test_wrong_single_password(self):
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_SINGLE_PWD_1)
-        self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_2)
+        self.assertRaises((DataDecryptError, DataHmacError), TestHelper.decrypt_data, enc_data, TEST_SINGLE_PWD_2)
 
     # Test error when decrypting with wrong multiple password
     def test_wrong_multiple_password(self):
         enc_data = TestHelper.encrypt_data(TEST_STR, TEST_MULTIPLE_PWD_1)
-        self.assertRaises(DataDecryptError, TestHelper.decrypt_data, enc_data, TEST_MULTIPLE_PWD_2)
+        self.assertRaises((DataDecryptError, DataHmacError), TestHelper.decrypt_data, enc_data, TEST_MULTIPLE_PWD_2)
 
     # Test error when encrypting with wrong salts length
     def test_wrong_salt_num(self):

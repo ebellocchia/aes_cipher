@@ -1,9 +1,10 @@
 # AES Cipher
 [![PyPI version](https://badge.fury.io/py/aes-cipher.svg)](https://badge.fury.io/py/aes-cipher)
+[![Code Analysis](https://github.com/ebellocchia/aes_cipher/actions/workflows/code-analysis.yml/badge.svg)](https://github.com/ebellocchia/aes_cipher/actions/workflows/code-analysis.yml)
+[![Build & Test](https://github.com/ebellocchia/aes_cipher/actions/workflows/test.yml/badge.svg)](https://github.com/ebellocchia/aes_cipher/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/ebellocchia/aes_cipher/branch/main/graph/badge.svg)](https://codecov.io/gh/ebellocchia/aes_cipher)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/9afd9788aa0e43faa491edcf6ed29d5e)](https://app.codacy.com/gh/ebellocchia/aes_cipher/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/ebellocchia/aes_cipher/badge)](https://www.codefactor.io/repository/github/ebellocchia/aes_cipher)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/ebellocchia/bip_utils/master/LICENSE)
 
 ## Introduction
 

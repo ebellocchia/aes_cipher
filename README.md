@@ -1,10 +1,11 @@
 # AES Cipher
-[![PyPI version](https://badge.fury.io/py/aes-cipher.svg)](https://badge.fury.io/py/aes-cipher)
-[![Code Analysis](https://github.com/ebellocchia/aes_cipher/actions/workflows/code-analysis.yml/badge.svg)](https://github.com/ebellocchia/aes_cipher/actions/workflows/code-analysis.yml)
-[![Build & Test](https://github.com/ebellocchia/aes_cipher/actions/workflows/test.yml/badge.svg)](https://github.com/ebellocchia/aes_cipher/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/ebellocchia/aes_cipher/branch/main/graph/badge.svg)](https://codecov.io/gh/ebellocchia/aes_cipher)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/9afd9788aa0e43faa491edcf6ed29d5e)](https://app.codacy.com/gh/ebellocchia/aes_cipher/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![CodeFactor](https://www.codefactor.io/repository/github/ebellocchia/aes_cipher/badge)](https://www.codefactor.io/repository/github/ebellocchia/aes_cipher)
+
+| |
+|---|
+| [![PyPI - Version](https://img.shields.io/pypi/v/aes_cipher.svg?logo=pypi&label=PyPI&logoColor=gold)](https://pypi.org/project/aes_cipher/) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aes_cipher.svg?logo=python&label=Python&logoColor=gold)](https://pypi.org/project/aes_cipher/) [![GitHub License](https://img.shields.io/github/license/ebellocchia/aes_cipher?label=License)](https://github.com/ebellocchia/aes_cipher?tab=MIT-1-ov-file) |
+| [![Code Coverage](https://github.com/ebellocchia/aes_cipher/actions/workflows/codecov.yml/badge.svg)](https://github.com/ebellocchia/aes_cipher/actions/workflows/codecov.yml) [![Code Analysis](https://github.com/ebellocchia/aes_cipher/actions/workflows/code-analysis.yml/badge.svg)](https://github.com/ebellocchia/aes_cipher/actions/workflows/code-analysis.yml) [![Build & Test](https://github.com/ebellocchia/aes_cipher/actions/workflows/test.yml/badge.svg)](https://github.com/ebellocchia/aes_cipher/actions/workflows/test.yml) |
+| [![Codecov](https://img.shields.io/codecov/c/github/ebellocchia/aes_cipher?label=Code%20Coverage)](https://codecov.io/gh/ebellocchia/aes_cipher) [![Codacy grade](https://img.shields.io/codacy/grade/9afd9788aa0e43faa491edcf6ed29d5e?label=Codacy%20Grade)](https://app.codacy.com/gh/ebellocchia/aes_cipher/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) [![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/ebellocchia/aes_cipher?label=CodeFactor%20Grade)](https://www.codefactor.io/repository/github/ebellocchia/aes_cipher) |
+| |
 
 ## Introduction
 

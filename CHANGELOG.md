@@ -1,3 +1,7 @@
+# 2.0.1
+
+- Update Python versions
+
 # 2.0.0
 
 - Add possibility to use a custom key derivation function

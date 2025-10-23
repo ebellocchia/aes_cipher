@@ -31,13 +31,7 @@ In the last case, the file will be encrypted multiple times with a different pas
 The package requires Python >= 3.7.
 
 To install it:
-- Using *setuptools*:
-
-        python setup.py install
-
-- Using *pip*:
-
-        pip install aes_cipher
+    pip install aes_cipher
 
 ## Test and Coverage
 

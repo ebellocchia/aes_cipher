@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aes_cipher"
+dynamic = ["version", "dependencies"]
+authors = [
+    {name = "Emanuele Bellocchia", email = "ebellocchia@gmail.com"}
+]
+maintainers = [
+    {name = "Emanuele Bellocchia", email = "ebellocchia@gmail.com"}
+]
+description = "Cipher based on AES256-CBC"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.7"
+keywords = [
+    "cipher",
+    "aes",
+    "aes256",
+    "sha",
+    "sha256",
+    "sha512",
+    "pbkdf2",
+    "pbkdf2-sha512",
+    "hmac",
+    "hmac-sha256"
+]
+classifiers = [
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+]
+
+[project.urls]
+Homepage = "https://github.com/ebellocchia/aes_cipher"
+Download = "https://github.com/ebellocchia/aes_cipher/archive/v{version}.tar.gz"
+
+[tool.setuptools]
+packages = {find = {exclude = ["tests"]}}
+
+[tool.setuptools.dynamic]
+version = {attr = "aes_cipher._version.__version__"}
+dependencies = {file = ["requirements.txt"]}

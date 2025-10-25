@@ -28,15 +28,10 @@ In the last case, the file will be encrypted multiple times with a different pas
 
 ## Installation
 
-The package requires Python >= 3.7.
+The package requires Python >= 3.7.\
 To install it:
 
     pip install aes_cipher
-
-**NOTE:** for Python 3.7 and 3.8, please use the `pyproject_legacy.toml` file and install the package from the local folder.
-Just rename it to `pyproject.toml`, overwriting the existent one, and install the package with *pip* from the local folder:
-
-    pip install .
 
 ## Test and Coverage
 

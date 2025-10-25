@@ -55,7 +55,7 @@ Repository = "https://github.com/ebellocchia/aes_cipher"
 Download = "https://github.com/ebellocchia/aes_cipher/archive/v{version}.tar.gz"
 
 [tool.setuptools]
-packages = {find = {}}
+packages = {find = {exclude = ["app", "tests"]}}
 
 [tool.setuptools.dynamic]
 version = {attr = "aes_cipher._version.__version__"}

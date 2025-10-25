@@ -45,6 +45,8 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/ebellocchia/aes_cipher"
+Changelog = "https://github.com/ebellocchia/aes_cipher/blob/master/CHANGELOG.md"
+Repository = "https://github.com/ebellocchia/aes_cipher"
 Download = "https://github.com/ebellocchia/aes_cipher/archive/v{version}.tar.gz"
 
 [tool.setuptools]

@@ -61,3 +61,7 @@ packages = {find = {exclude = ["app", "tests"]}}
 [tool.setuptools.dynamic]
 version = {attr = "aes_cipher._version.__version__"}
 dependencies = {file = ["requirements.txt"]}
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = "(?x)(\\.github|\\.eggs|\\.tox|build|tests|venv)"

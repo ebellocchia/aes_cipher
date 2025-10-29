@@ -66,18 +66,6 @@ version = {attr = "aes_cipher._version.__version__"}
 dependencies = {file = ["requirements.txt"]}
 optional-dependencies.develop = {file = ["requirements-dev.txt"]}
 
-[tool.mypy]
-ignore_missing_imports = true
-exclude = [
-    "\\.github",
-    "\\.eggs",
-    "\\.egg-info",
-    "\\.tox",
-    "build",
-    "tests",
-    "venv",
-]
-
 #
 # Tools configuration
 #

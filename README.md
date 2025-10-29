@@ -48,6 +48,13 @@ To run tests with coverage:
     coverage run -m unittest discover
     coverage report
 
+To run code analysis:
+
+    mypy .
+    ruff check .
+
+`tox` can also be used for testing and code analysis (check `tox.ini` for the environments).
+
 ## APIs
 
 ### Key derivation

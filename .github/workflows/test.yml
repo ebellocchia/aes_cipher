@@ -20,7 +20,6 @@ jobs:
         python-version: ["3.7"]
         os:
           - ubuntu-22.04
-          - macOS-13
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
@@ -50,7 +49,7 @@ jobs:
         python-version: ["3.8"]
         os:
           - ubuntu-latest
-          - macOS-13
+          - macOS-14
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
@@ -80,7 +79,7 @@ jobs:
         python-version: ["3.9", "3.10"]
         os:
           - ubuntu-latest
-          - macOS-13
+          - macOS-14
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:

@@ -18,9 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 import argparse
 import logging
 import sys
@@ -31,13 +28,10 @@ from typing import Any, Dict, List, Tuple
 from aes_cipher import DataDecryptError, DataHmacError, FileDecrypter, FileEncrypter, Pbkdf2Sha512
 
 
-#
-# Classes
-#
-
-# Argument types
 @unique
 class ArgumentTypes(Enum):
+    """Argument types."""
+
     MODE = auto()
     PASSWORDS = auto()
     INPUT_PATHS = auto()
@@ -47,45 +41,76 @@ class ArgumentTypes(Enum):
     VERBOSE = auto()
 
 
-# Arguments
 class Arguments:
+    """Arguments."""
+
     MODES: Tuple[str, str] = ("dec", "enc")
 
     args_val: Dict[ArgumentTypes, Any]
 
-    # Constructor
     def __init__(self) -> None:
+        """Constructor."""
         self.Reset()
 
-    # Get argument value
     def GetValue(self,
                  arg_type: ArgumentTypes) -> Any:
+        """Get argument value.
+
+        Args:
+            arg_type: Argument type
+
+        Returns:
+            Argument value
+
+        Raises:
+            TypeError: If argument type is invalid
+        """
         if not isinstance(arg_type, ArgumentTypes):
             raise TypeError("Invalid argument type")
         return self.args_val[arg_type]
 
-    # Set argument value
     def SetValue(self,
                  value: Any,
                  arg_type: ArgumentTypes) -> None:
+        """Set argument value.
+
+        Args:
+            value: Value to set
+            arg_type: Argument type
+
+        Raises:
+            TypeError: If argument type is invalid
+        """
         if not isinstance(arg_type, ArgumentTypes):
             raise TypeError("Invalid argument type")
         self.args_val[arg_type] = value
 
-    # Get if verbose
     def IsVerbose(self) -> bool:
+        """Get if verbose.
+
+        Returns:
+            True if verbose mode is enabled
+        """
         return self.GetValue(ArgumentTypes.VERBOSE)
 
-    # Get if decrypt mode
     def IsDecryptMode(self) -> bool:
+        """Get if decrypt mode.
+
+        Returns:
+            True if in decrypt mode
+        """
         return self.GetValue(ArgumentTypes.MODE) == self.MODES[0]
 
-    # Get if encrypt mode
     def IsEncryptMode(self) -> bool:
+        """Get if encrypt mode.
+
+        Returns:
+            True if in encrypt mode
+        """
         return self.GetValue(ArgumentTypes.MODE) == self.MODES[1]
 
-    # Reset
     def Reset(self) -> None:
+        """Reset."""
         self.args_val = {
             ArgumentTypes.MODE: "",
             ArgumentTypes.PASSWORDS: "",
@@ -97,13 +122,13 @@ class Arguments:
         }
 
 
-# Argument parser
 class ArgumentsParser:
+    """Argument parser."""
 
     parser: argparse.ArgumentParser
 
-    # Constructor
     def __init__(self) -> None:
+        """Constructor."""
         self.parser = argparse.ArgumentParser()
         required = self.parser.add_argument_group("required arguments")
         optional = self.parser.add_argument_group("optional arguments")
@@ -151,8 +176,12 @@ class ArgumentsParser:
             action="store_true"
         )
 
-    # Parse arguments
     def Parse(self) -> Arguments:
+        """Parse arguments.
+
+        Returns:
+            Arguments object
+        """
         parsed_args = self.parser.parse_args()
 
         args = Arguments()
@@ -166,9 +195,16 @@ class ArgumentsParser:
 
         return args
 
-    # Parse input paths
     @staticmethod
     def __ParseInputPaths(value: str) -> List[Path]:
+        """Parse input paths.
+
+        Args:
+            value: Input path string
+
+        Returns:
+            List of Path objects
+        """
         curr_path = Path(value)
         if curr_path.is_dir():
             files = [p for p in curr_path.iterdir() if p.is_file() and not p.name.startswith(".")]
@@ -178,14 +214,16 @@ class ArgumentsParser:
         return files
 
 
-#
-# Functions
-#
-
-# Encrypt file
 def EncryptFile(in_file: str,
                 out_path: str,
                 args: Arguments) -> None:
+    """Encrypt file.
+
+    Args:
+        in_file: Input file path
+        out_path: Output file path
+        args: Arguments object
+    """
     print(f"Encrypting file: '{in_file}'...")
 
     file_encrypter = FileEncrypter(
@@ -203,10 +241,16 @@ def EncryptFile(in_file: str,
     print(f"Output file saved to: '{out_path}'")
 
 
-# Decrypt file
 def DecryptFile(in_file: str,
                 out_path: str,
                 args: Arguments) -> None:
+    """Decrypt file.
+
+    Args:
+        in_file: Input file path
+        out_path: Output file path
+        args: Arguments object
+    """
     print(f"Decrypting file: '{in_file}'...")
 
     try:
@@ -228,8 +272,12 @@ def DecryptFile(in_file: str,
         print(f"ERROR: unable to decrypt file '{in_file}'")
 
 
-# Run application
 def RunApp(args: Arguments) -> None:
+    """Run application.
+
+    Args:
+        args: Arguments object
+    """
     enc_suffix: str = "_enc"
 
     # Get input files
@@ -261,14 +309,11 @@ def RunApp(args: Arguments) -> None:
     print("Operation completed")
 
 
-# Main
 def main() -> None:
-    # Get arguments
+    """Main."""
     args_parser = ArgumentsParser()
-    # Run application
     RunApp(args_parser.Parse())
 
 
-# Execute main
 if __name__ == "__main__":
     main()

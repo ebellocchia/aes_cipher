@@ -18,34 +18,44 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 from Crypto.Cipher import AES
 
 
-#
-# Classes
-#
-
-# AES constants class
 class AesConst:
-    # Get block size
+    """AES constants class."""
+
     @staticmethod
     def BlockSize() -> int:
+        """Get block size.
+
+        Returns:
+            Block size in bytes
+        """
         return AES.block_size
 
-    # Get pad size
     @staticmethod
     def PadSize() -> int:
+        """Get pad size.
+
+        Returns:
+            Pad size in bytes
+        """
         return AesConst.BlockSize()
 
-    # Get key size
     @staticmethod
     def KeySize() -> int:
+        """Get key size.
+
+        Returns:
+            Key size in bytes
+        """
         return AesConst.BlockSize() * 2
 
-    # Get IV size
     @staticmethod
     def IvSize() -> int:
+        """Get IV size.
+
+        Returns:
+            IV size in bytes
+        """
         return AesConst.BlockSize()

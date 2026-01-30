@@ -18,47 +18,49 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 import logging
 
 
-#
-# Classes
-#
-
-# Constant for logger class
 class LoggerConst:
+    """Constant for logger class."""
+
     LOGGER_NAME: str = "aes_cipher"
     LOG_FORMAT: str = "  LOG %(levelname)s - %(message)s"
 
 
-# Logger class
 class Logger:
+    """Logger class."""
 
     logger: logging.Logger
 
-    # Constructor
     def __init__(self) -> None:
+        """Constructor."""
         self.__CreateLogger()
         self.__ConfigureLogger()
 
-    # Set level
     def SetLevel(self,
                  level: int) -> None:
+        """Set level.
+
+        Args:
+            level: Logging level
+        """
         self.logger.setLevel(level)
 
-    # Get logger
     def GetLogger(self) -> logging.Logger:
+        """Get logger.
+
+        Returns:
+            Logger instance
+        """
         return self.logger
 
-    # Create logger
     def __CreateLogger(self) -> None:
+        """Create logger."""
         self.logger = logging.getLogger(LoggerConst.LOGGER_NAME)
 
-    # Configure logger
     def __ConfigureLogger(self) -> None:
+        """Configure logger."""
         ch = logging.StreamHandler()
         ch.setFormatter(logging.Formatter(LoggerConst.LOG_FORMAT))
         self.logger.addHandler(ch)

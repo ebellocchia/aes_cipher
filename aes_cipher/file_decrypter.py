@@ -18,9 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 from typing import List, Union
 
 from aes_cipher.data_decrypter import DataDecrypter
@@ -31,38 +28,53 @@ from aes_cipher.logger import Logger
 from aes_cipher.pbkdf2_sha512 import Pbkdf2Sha512Default
 
 
-#
-# Classes
-#
-
-# File decrypter class
 class FileDecrypter:
+    """File decrypter class."""
 
     decrypter: DataDecrypter
 
-    # Constructor
     def __init__(self,
                  key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
+        """Constructor.
+
+        Args:
+            key_derivator: Key derivator instance
+        """
         self.decrypter = DataDecrypter(key_derivator)
 
-    # Get logger
     def Logger(self) -> Logger:
+        """Get logger.
+
+        Returns:
+            Logger instance
+        """
         return self.decrypter.Logger()
 
-    # Decrypt
     def Decrypt(self,
                 file_in: str,
                 passwords: List[Union[str, bytes]]) -> None:
-        # Read file
+        """Decrypt.
+
+        Args:
+            file_in: Input file path
+            passwords: List of passwords for decryption
+        """
         file_data = FileReader.Read(file_in)
-        # Decrypt it
         self.decrypter.Decrypt(file_data, passwords)
 
-    # Get decrypted data
     def GetDecryptedData(self) -> bytes:
+        """Get decrypted data.
+
+        Returns:
+            Decrypted data
+        """
         return self.decrypter.GetDecryptedData()
 
-    # Save to file
     def SaveTo(self,
                file_out: str) -> None:
+        """Save to file.
+
+        Args:
+            file_out: Output file path
+        """
         FileWriter.Write(file_out, self.GetDecryptedData())

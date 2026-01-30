@@ -18,9 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 from typing import List, Tuple, Union
 
 from aes_cipher.aes_cbc_decrypter import AesCbcDecrypter
@@ -35,44 +32,50 @@ from aes_cipher.salt_length import SaltLength
 from aes_cipher.utils import Utils
 
 
-#
-# Classes
-#
-
-# Constants for data decrypter
 class DataDecrypterConst:
-    # Salt offsets (relative to the beginning of data)
+    """Constants for data decrypter."""
+
     SALT_LEN_OFF: int = 0
     SALT_OFF: int = SaltLength.EncodedLengthSize()
 
-    # Internal key/IV offsets (relative to the end of salt information)
     INT_KEY_OFF: int = 0
     INT_IV_OFF: int = AesConst.KeySize()
     INT_KEY_IV_PAD_OFF: int = AesConst.KeySize() + AesConst.IvSize()
     INT_KEY_IV_DIG_OFF: int = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize()
 
-    # Data offsets (relative to the end of salt information)
     DATA_ENC_OFF: int = AesConst.KeySize() + AesConst.IvSize() + AesConst.PadSize() + HmacSha256.DigestSize()
     DATA_DIG_OFF: int = -1 * HmacSha256.DigestSize()
 
 
-# Data decrypter class
 class DataDecrypter(LoggableBase):
+    """Data decrypter class."""
 
     decrypted_data: bytes
     key_derivator: IKeyDerivator
 
-    # Constructor
     def __init__(self,
                  key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
+        """Constructor.
+
+        Args:
+            key_derivator: Key derivator instance
+        """
         super().__init__()
         self.decrypted_data = b""
         self.key_derivator = key_derivator
 
-    # Decrypt
     def Decrypt(self,
                 data: bytes,
                 passwords: List[Union[str, bytes]]) -> None:
+        """Decrypt.
+
+        Args:
+            data: Data to decrypt
+            passwords: List of passwords for decryption
+
+        Raises:
+            DataDecryptError: If decryption fails
+        """
         # Initialize current data
         curr_data = data
 
@@ -93,86 +96,102 @@ class DataDecrypter(LoggableBase):
             key_iv_gen.GenerateMaster(password, salt)
 
             try:
-                data_without_salt = curr_data[DataDecrypterConst.SALT_OFF + len(salt):]
+                data_without_salt = curr_data[DataDecrypterConst.SALT_OFF + len(salt) :]
                 # Read internal key and IV
-                internal_key, internal_iv = self.__ReadInternalKeyIv(
-                    data_without_salt,
-                    key_iv_gen
-                )
+                internal_key, internal_iv = self.__ReadInternalKeyIv(data_without_salt, key_iv_gen)
                 # Read data
-                curr_data = self.__ReadData(
-                    data_without_salt,
-                    internal_key,
-                    internal_iv
-                )
+                curr_data = self.__ReadData(data_without_salt, internal_key, internal_iv)
             except (IndexError, ValueError) as ex:
                 raise DataDecryptError("Unable to decrypt file") from ex
 
         self.decrypted_data = curr_data
 
-    # Get decrypted data
     def GetDecryptedData(self) -> bytes:
+        """Get decrypted data.
+
+        Returns:
+            Decrypted data
+        """
         return self.decrypted_data
 
-    # Read salt
     def __ReadSalt(self,
                    data: bytes) -> bytes:
-        # Get salt and its length
-        salt_len = SaltLength.DecodeLength(
-            data[DataDecrypterConst.SALT_LEN_OFF:DataDecrypterConst.SALT_OFF]
-        )
-        salt = data[DataDecrypterConst.SALT_OFF:DataDecrypterConst.SALT_OFF + salt_len]
-        # Log
+        """Read salt.
+
+        Args:
+            data: Data to read salt from
+
+        Returns:
+            Salt bytes
+        """
+        salt_len = SaltLength.DecodeLength(data[DataDecrypterConst.SALT_LEN_OFF : DataDecrypterConst.SALT_OFF])
+        salt = data[DataDecrypterConst.SALT_OFF : DataDecrypterConst.SALT_OFF + salt_len]
         self.logger.GetLogger().info(f"  Salt: {Utils.BytesToHexStr(salt)}")
         self.logger.GetLogger().info(f"  Salt length: {salt_len}")
 
         return salt
 
-    # Read internal key and IV
     def __ReadInternalKeyIv(self,
                             data: bytes,
                             key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
-        # Get encrypted bytes and digest
-        key_iv_encrypted = data[DataDecrypterConst.INT_KEY_OFF:DataDecrypterConst.INT_KEY_IV_DIG_OFF]
-        key_iv_digest = data[DataDecrypterConst.INT_KEY_IV_DIG_OFF:DataDecrypterConst.DATA_ENC_OFF]
+        """Read internal key and IV.
 
-        # Log
+        Args:
+            data: Data to read from
+            key_iv_gen: Key/IV generator instance
+
+        Returns:
+            Tuple of (internal key, internal IV)
+
+        Raises:
+            DataHmacError: If HMAC verification fails
+        """
+        key_iv_encrypted = data[DataDecrypterConst.INT_KEY_OFF : DataDecrypterConst.INT_KEY_IV_DIG_OFF]
+        key_iv_digest = data[DataDecrypterConst.INT_KEY_IV_DIG_OFF : DataDecrypterConst.DATA_ENC_OFF]
+
         self.logger.GetLogger().info(f"  Encrypted internal key/IV: {Utils.BytesToHexStr(key_iv_encrypted)}")
         self.logger.GetLogger().info(f"  Internal key/IV digest: {Utils.BytesToHexStr(key_iv_digest)}")
 
-        # Decrypt internal key and IV with master key and IV
         aes_decrypter = AesCbcDecrypter(key_iv_gen.GetMasterKey(), key_iv_gen.GetMasterIV())
         aes_decrypter.Decrypt(key_iv_encrypted)
         key_iv_decrypted = aes_decrypter.GetDecryptedData()
-        # Verify digest
         if not HmacSha256.QuickVerify(key_iv_gen.GetMasterKey(), key_iv_decrypted, key_iv_digest):
             raise DataHmacError("Invalid HMAC for internal key and IV")
 
-        return (key_iv_decrypted[DataDecrypterConst.INT_KEY_OFF: DataDecrypterConst.INT_IV_OFF],
-                key_iv_decrypted[DataDecrypterConst.INT_IV_OFF: DataDecrypterConst.INT_KEY_IV_PAD_OFF])
+        return (
+            key_iv_decrypted[DataDecrypterConst.INT_KEY_OFF : DataDecrypterConst.INT_IV_OFF],
+            key_iv_decrypted[DataDecrypterConst.INT_IV_OFF : DataDecrypterConst.INT_KEY_IV_PAD_OFF],
+        )
 
-    # Read data
     def __ReadData(self,
                    data: bytes,
                    internal_key: bytes,
                    internal_iv: bytes) -> bytes:
-        # Get encrypted bytes and digest
-        data_encrypted = data[DataDecrypterConst.DATA_ENC_OFF: DataDecrypterConst.DATA_DIG_OFF]
-        data_digest = data[DataDecrypterConst.DATA_DIG_OFF:]
+        """Read data.
 
-        # Log
+        Args:
+            data: Data to read from
+            internal_key: Internal key for decryption
+            internal_iv: Internal IV for decryption
+
+        Returns:
+            Decrypted data
+
+        Raises:
+            DataHmacError: If HMAC verification fails
+        """
+        data_encrypted = data[DataDecrypterConst.DATA_ENC_OFF : DataDecrypterConst.DATA_DIG_OFF]
+        data_digest = data[DataDecrypterConst.DATA_DIG_OFF :]
+
         self.logger.GetLogger().info(f"  Encrypted data: {Utils.BytesToHexStr(data_encrypted)}")
         self.logger.GetLogger().info(f"  Data digest: {Utils.BytesToHexStr(data_digest)}")
 
-        # Decrypt data with internal key and IV
         aes_decrypter = AesCbcDecrypter(internal_key, internal_iv)
         aes_decrypter.Decrypt(data_encrypted)
         data_decrypted = aes_decrypter.GetDecryptedData()
-        # Verify digest
         if not HmacSha256.QuickVerify(internal_key, data_decrypted, data_digest):
             raise DataHmacError("Invalid HMAC for data")
 
-        # Log
         self.logger.GetLogger().info(f"  Decrypted data: {Utils.BytesToHexStr(data_decrypted)}")
 
         return data_decrypted

@@ -18,9 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 from typing import Any, Union
 
 from Crypto.Cipher import AES
@@ -30,37 +27,48 @@ from aes_cipher.aes_const import AesConst
 from aes_cipher.utils import Utils
 
 
-#
-# Classes
-#
-
-# AES-CBC decrypter class
 class AesCbcDecrypter:
+    """AES-CBC decrypter class."""
 
     decrypted_data: bytes
     aes: Any
 
-    # Constructor
     def __init__(self,
                  key: Union[str, bytes],
                  iv: Union[str, bytes]) -> None:
-        self.decrypted_data = b""
-        self.aes = AES.new(
-            Utils.Encode(key),
-            AES.MODE_CBC,
-            iv=Utils.Encode(iv)
-        )
+        """Constructor.
 
-    # Decrypt data
-    def Decrypt(self,
-                data: bytes) -> None:
+        Args:
+            key: Decryption key
+            iv: Initialization vector
+        """
+        self.decrypted_data = b""
+        self.aes = AES.new(Utils.Encode(key), AES.MODE_CBC, iv=Utils.Encode(iv))
+
+    def Decrypt(self, data: bytes) -> None:
+        """Decrypt data.
+
+        Args:
+            data: Data to decrypt
+        """
         self.decrypted_data = self.UnPad(self.aes.decrypt(data))
 
-    # Get decrypted data
     def GetDecryptedData(self) -> bytes:
+        """Get decrypted data.
+
+        Returns:
+            Decrypted data
+        """
         return self.decrypted_data
 
-    # Unpad data
     @staticmethod
     def UnPad(data: bytes) -> bytes:
+        """Unpad data.
+
+        Args:
+            data: Data to unpad
+
+        Returns:
+            Unpadded data
+        """
         return unpad(data, AesConst.BlockSize())

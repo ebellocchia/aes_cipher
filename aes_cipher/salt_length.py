@@ -18,29 +18,45 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Classes
-#
 
-# Constant for salt length class
 class SaltLengthConst:
-    # Salt length size
+    """Constant for salt length class."""
+
     SALT_LEN_SIZE: int = 4
 
 
-# Salt length class
 class SaltLength:
-    # Get encoded length size
+    """Salt length class."""
+
     @staticmethod
     def EncodedLengthSize() -> int:
+        """Get encoded length size.
+
+        Returns:
+            Encoded length size in bytes
+        """
         return SaltLengthConst.SALT_LEN_SIZE
 
-    # Decode length
     @staticmethod
     def DecodeLength(salt_len_bytes: bytes) -> int:
+        """Decode length.
+
+        Args:
+            salt_len_bytes: Salt length bytes
+
+        Returns:
+            Decoded salt length
+        """
         return int.from_bytes(salt_len_bytes, "big")
 
-    # Encode length
     @staticmethod
     def EncodeLength(salt: bytes) -> bytes:
+        """Encode length.
+
+        Args:
+            salt: Salt bytes
+
+        Returns:
+            Encoded salt length
+        """
         return len(salt).to_bytes(SaltLengthConst.SALT_LEN_SIZE, "big")

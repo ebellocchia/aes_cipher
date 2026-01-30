@@ -18,49 +18,82 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 import binascii
 from typing import Union
 
 
-#
-# Classes
-#
-
-# Wrapper for utility functions
 class Utils:
-    # Decode data to specified encoding
+    """Wrapper for utility functions."""
+
     @staticmethod
     def Decode(data: Union[str, bytes],
                encoding: str = "utf-8") -> str:
+        """Decode data to specified encoding.
+
+        Args:
+            data: Data to decode
+            encoding: Encoding to use
+
+        Returns:
+            Decoded string
+
+        Raises:
+            TypeError: If data type is invalid
+        """
         if isinstance(data, str):
             return data
         if isinstance(data, bytes):
             return data.decode(encoding)
         raise TypeError("Invalid data type")
 
-    # Encode data to specified encoding
     @staticmethod
     def Encode(data: Union[str, bytes],
                encoding: str = "utf-8") -> bytes:
+        """Encode data to specified encoding.
+
+        Args:
+            data: Data to encode
+            encoding: Encoding to use
+
+        Returns:
+            Encoded bytes
+
+        Raises:
+            TypeError: If data type is invalid
+        """
         if isinstance(data, str):
             return data.encode(encoding)
         if isinstance(data, bytes):
             return data
         raise TypeError("Invalid data type")
 
-    # Convert data to string
     @staticmethod
     def DataToString(data: Union[str, bytes]) -> str:
+        """Convert data to string.
+
+        Args:
+            data: Data to convert
+
+        Returns:
+            String representation
+
+        Raises:
+            TypeError: If data type is invalid
+        """
         if isinstance(data, str):
             return data
         if isinstance(data, bytes):
             return Utils.BytesToHexStr(data)
         raise TypeError("Invalid data type")
 
-    # Convert bytes to hex string
     @staticmethod
     def BytesToHexStr(data: bytes) -> str:
+        """Convert bytes to hex string.
+
+        Args:
+            data: Bytes to convert
+
+        Returns:
+            Hex string
+        """
         return Utils.Decode(binascii.hexlify(data))

@@ -18,22 +18,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 from abc import ABC, abstractmethod
 from typing import Union
 
 
-#
-# Classes
-#
-
-#  Key derivator interface
 class IKeyDerivator(ABC):
-    # Derive key. Output shall be at least 48-byte long.
+    """Key derivator interface."""
+
     @abstractmethod
     def DeriveKey(self,
                   password: Union[str, bytes],
                   salt: Union[str, bytes]) -> bytes:
+        """Derive key. Output shall be at least 48-byte long.
+
+        Args:
+            password: Password for key derivation
+            salt: Salt for key derivation
+
+        Returns:
+            Derived key (at least 48 bytes)
+        """
         pass

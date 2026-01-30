@@ -18,9 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 from typing import Union
 
 from Crypto.Protocol.KDF import scrypt
@@ -30,41 +27,53 @@ from aes_cipher.ikey_derivator import IKeyDerivator
 from aes_cipher.utils import Utils
 
 
-#
-# Classes
-#
-
-# Scrypt class
 class Scrypt(IKeyDerivator):
+    """Scrypt class."""
 
     n: int
     r: int
     p: int
 
-    # Constructor
     def __init__(self,
                  n: int,
                  r: int,
                  p: int) -> None:
+        """Constructor.
+
+        Args:
+            n: CPU/memory cost parameter
+            r: Block size parameter
+            p: Parallelization parameter
+
+        Raises:
+            ValueError: If scrypt parameters are invalid
+        """
         if n <= 0 or r <= 0 or p <= 0:
             raise ValueError(f"Invalid scrypt parameters ({n}, {r}, {p})")
         self.n = n
         self.r = r
         self.p = p
 
-    # Derive key
     def DeriveKey(self,
                   password: Union[str, bytes],
                   salt: Union[str, bytes]) -> bytes:
+        """Derive key.
+
+        Args:
+            password: Password for key derivation
+            salt: Salt for key derivation
+
+        Returns:
+            Derived key
+        """
         return scrypt(
-            Utils.Decode(password),     # type: ignore
-            Utils.Encode(salt),         # type: ignore
+            Utils.Decode(password),  # type: ignore
+            Utils.Encode(salt),  # type: ignore
             key_len=AesConst.KeySize() + AesConst.IvSize(),
             N=self.n,
             r=self.r,
-            p=self.p
+            p=self.p,
         )
 
 
-# Default class
 ScryptDefault = Scrypt(16384, 8, 8)

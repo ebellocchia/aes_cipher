@@ -18,15 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Classes
-#
 
-# File reader class
 class FileReader:
-    # Read file
+    """File reader class."""
+
     @staticmethod
     def Read(file_in: str) -> bytes:
+        """Read file.
+
+        Args:
+            file_in: Input file path
+
+        Returns:
+            File data as bytes
+        """
         with open(file_in, "rb") as fin:
             file_data = fin.read()
 

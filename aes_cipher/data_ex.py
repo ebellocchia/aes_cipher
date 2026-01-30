@@ -18,15 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Classes
-#
 
-# Data HMAC error
 class DataHmacError(Exception):
+    """Data HMAC error."""
+
     pass
 
 
-# Data decrypt error
 class DataDecryptError(Exception):
+    """Data decrypt error."""
+
     pass

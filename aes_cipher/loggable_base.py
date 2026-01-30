@@ -18,25 +18,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 from aes_cipher.logger import Logger
 
 
-#
-# Classes
-#
-
-# Base class for classes that support logging
 class LoggableBase:
+    """Base class for classes that support logging."""
 
     logger: Logger
 
-    # Constructor
     def __init__(self) -> None:
+        """Constructor."""
         self.logger = Logger()
 
-    # Get logger
     def Logger(self) -> Logger:
+        """Get logger.
+
+        Returns:
+            Logger instance
+        """
         return self.logger

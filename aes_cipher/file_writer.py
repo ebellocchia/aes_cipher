@@ -18,15 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Classes
-#
 
-# File writer class
 class FileWriter:
-    # Write file
+    """File writer class."""
+
     @staticmethod
     def Write(file_out: str,
               data: bytes) -> None:
+        """Write file.
+
+        Args:
+            file_out: Output file path
+            data: Data to write
+        """
         with open(file_out, "wb") as fout:
             fout.write(data)

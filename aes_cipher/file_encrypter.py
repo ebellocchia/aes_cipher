@@ -18,9 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 from typing import List, Optional, Union
 
 from aes_cipher.data_encrypter import DataEncrypter
@@ -31,39 +28,55 @@ from aes_cipher.logger import Logger
 from aes_cipher.pbkdf2_sha512 import Pbkdf2Sha512Default
 
 
-#
-# Classes
-#
-
-# File encrypter class
 class FileEncrypter:
+    """File encrypter class."""
 
     encrypter: DataEncrypter
 
-    # Constructor
     def __init__(self,
                  key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
+        """Constructor.
+
+        Args:
+            key_derivator: Key derivator instance
+        """
         self.encrypter = DataEncrypter(key_derivator)
 
-    # Get logger
     def Logger(self) -> Logger:
+        """Get logger.
+
+        Returns:
+            Logger instance
+        """
         return self.encrypter.Logger()
 
-    # Encrypt
     def Encrypt(self,
                 file_in: str,
                 passwords: List[Union[str, bytes]],
                 salts: Optional[List[Union[str, bytes]]] = None) -> None:
-        # Read file
+        """Encrypt.
+
+        Args:
+            file_in: Input file path
+            passwords: List of passwords for encryption
+            salts: Optional list of salts
+        """
         file_data = FileReader.Read(file_in)
-        # Encrypt it
         self.encrypter.Encrypt(file_data, passwords, salts)
 
-    # Get encrypted data
     def GetEncryptedData(self) -> bytes:
+        """Get encrypted data.
+
+        Returns:
+            Encrypted data
+        """
         return self.encrypter.GetEncryptedData()
 
-    # Save to file
     def SaveTo(self,
                file_out: str) -> None:
+        """Save to file.
+
+        Args:
+            file_out: Output file path
+        """
         FileWriter.Write(file_out, self.GetEncryptedData())

@@ -18,9 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 from typing import Any, Union
 
 from Crypto.Cipher import AES
@@ -30,37 +27,48 @@ from aes_cipher.aes_const import AesConst
 from aes_cipher.utils import Utils
 
 
-#
-# Classes
-#
-
-# AES-CBC encrypter class
 class AesCbcEncrypter:
+    """AES-CBC encrypter class."""
 
     encrypted_data: bytes
     aes: Any
 
-    # Constructor
     def __init__(self,
                  key: Union[str, bytes],
                  iv: Union[str, bytes]) -> None:
-        self.encrypted_data = b""
-        self.aes = AES.new(
-            Utils.Encode(key),
-            AES.MODE_CBC,
-            iv=Utils.Encode(iv)
-        )
+        """Constructor.
 
-    # Encrypt data
-    def Encrypt(self,
-                data: Union[str, bytes]) -> None:
+        Args:
+            key: Encryption key
+            iv: Initialization vector
+        """
+        self.encrypted_data = b""
+        self.aes = AES.new(Utils.Encode(key), AES.MODE_CBC, iv=Utils.Encode(iv))
+
+    def Encrypt(self, data: Union[str, bytes]) -> None:
+        """Encrypt data.
+
+        Args:
+            data: Data to encrypt
+        """
         self.encrypted_data = self.aes.encrypt(self.Pad(data))
 
-    # Get encrypted data
     def GetEncryptedData(self) -> bytes:
+        """Get encrypted data.
+
+        Returns:
+            Encrypted data
+        """
         return self.encrypted_data
 
-    # Pad data
     @staticmethod
     def Pad(data: Union[str, bytes]) -> bytes:
+        """Pad data.
+
+        Args:
+            data: Data to pad
+
+        Returns:
+            Padded data
+        """
         return pad(Utils.Encode(data), AesConst.BlockSize())

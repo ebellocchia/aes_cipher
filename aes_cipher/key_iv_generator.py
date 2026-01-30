@@ -18,9 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-#
-# Imports
-#
 import os
 from typing import Optional, Union
 
@@ -29,18 +26,14 @@ from aes_cipher.ikey_derivator import IKeyDerivator
 from aes_cipher.utils import Utils
 
 
-#
-# Classes
-#
-
-# Constants for Key and IV generator class
 class KeyIvGeneratorConst:
-    # Default salt size
+    """Constants for Key and IV generator class."""
+
     SALT_DEF_SIZE: int = 16
 
 
-# Key and IV generator class
 class KeyIvGenerator:
+    """Key and IV generator class."""
 
     key_derivator: IKeyDerivator
     internal_key: bytes
@@ -49,9 +42,13 @@ class KeyIvGenerator:
     master_iv: bytes
     salt: bytes
 
-    # Constructor
     def __init__(self,
                  key_derivator: IKeyDerivator) -> None:
+        """Constructor.
+
+        Args:
+            key_derivator: Key derivator instance
+        """
         self.key_derivator = key_derivator
         self.internal_key = b""
         self.internal_iv = b""
@@ -59,39 +56,62 @@ class KeyIvGenerator:
         self.master_iv = b""
         self.bytes = b""
 
-    # Generate master key and IV from password
     def GenerateMaster(self,
                        password: Union[str, bytes],
                        salt: Optional[Union[str, bytes]] = None) -> None:
-        # Generate salt if needed
+        """Generate master key and IV from password.
+
+        Args:
+            password: Password for key derivation
+            salt: Optional salt (generated if not provided)
+        """
         self.salt = Utils.Encode(salt) if salt is not None else os.urandom(KeyIvGeneratorConst.SALT_DEF_SIZE)
 
-        # Compute master key and IV
         der_key = self.key_derivator.DeriveKey(password, self.salt)
-        self.master_key = der_key[:AesConst.KeySize()]
-        self.master_iv = der_key[AesConst.KeySize(): AesConst.KeySize() + AesConst.IvSize()]
+        self.master_key = der_key[: AesConst.KeySize()]
+        self.master_iv = der_key[AesConst.KeySize() : AesConst.KeySize() + AesConst.IvSize()]
 
-    # Generate internal key and IV
     def GenerateInternal(self) -> None:
-        # Generate random internal key and IV
+        """Generate internal key and IV."""
         self.internal_key = os.urandom(AesConst.KeySize())
         self.internal_iv = os.urandom(AesConst.IvSize())
 
-    # Get master key
     def GetMasterKey(self) -> bytes:
+        """Get master key.
+
+        Returns:
+            Master key
+        """
         return self.master_key
 
-    # Get master IV
     def GetMasterIV(self) -> bytes:
+        """Get master IV.
+
+        Returns:
+            Master IV
+        """
         return self.master_iv
 
-    # Get internal key
     def GetInternalKey(self) -> bytes:
+        """Get internal key.
+
+        Returns:
+            Internal key
+        """
         return self.internal_key
 
-    # Get internal IV
     def GetInternalIV(self) -> bytes:
+        """Get internal IV.
+
+        Returns:
+            Internal IV
+        """
         return self.internal_iv
 
     def GetSalt(self) -> bytes:
+        """Get salt.
+
+        Returns:
+            Salt
+        """
         return self.salt

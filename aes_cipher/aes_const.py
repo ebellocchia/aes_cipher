@@ -26,7 +26,8 @@ class AesConst:
 
     @staticmethod
     def BlockSize() -> int:
-        """Get block size.
+        """
+        Get block size.
 
         Returns:
             Block size in bytes
@@ -35,7 +36,8 @@ class AesConst:
 
     @staticmethod
     def PadSize() -> int:
-        """Get pad size.
+        """
+        Get pad size.
 
         Returns:
             Pad size in bytes
@@ -44,7 +46,8 @@ class AesConst:
 
     @staticmethod
     def KeySize() -> int:
-        """Get key size.
+        """
+        Get key size.
 
         Returns:
             Key size in bytes
@@ -53,7 +56,8 @@ class AesConst:
 
     @staticmethod
     def IvSize() -> int:
-        """Get IV size.
+        """
+        Get IV size.
 
         Returns:
             IV size in bytes

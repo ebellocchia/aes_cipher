@@ -35,7 +35,8 @@ class FileDecrypter:
 
     def __init__(self,
                  key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             key_derivator: Key derivator instance
@@ -43,7 +44,8 @@ class FileDecrypter:
         self.decrypter = DataDecrypter(key_derivator)
 
     def Logger(self) -> Logger:
-        """Get logger.
+        """
+        Get logger.
 
         Returns:
             Logger instance
@@ -53,7 +55,8 @@ class FileDecrypter:
     def Decrypt(self,
                 file_in: str,
                 passwords: List[Union[str, bytes]]) -> None:
-        """Decrypt.
+        """
+        Decrypt.
 
         Args:
             file_in: Input file path
@@ -63,7 +66,8 @@ class FileDecrypter:
         self.decrypter.Decrypt(file_data, passwords)
 
     def GetDecryptedData(self) -> bytes:
-        """Get decrypted data.
+        """
+        Get decrypted data.
 
         Returns:
             Decrypted data
@@ -72,7 +76,8 @@ class FileDecrypter:
 
     def SaveTo(self,
                file_out: str) -> None:
-        """Save to file.
+        """
+        Save to file.
 
         Args:
             file_out: Output file path

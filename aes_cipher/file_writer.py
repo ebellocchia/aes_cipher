@@ -25,7 +25,8 @@ class FileWriter:
     @staticmethod
     def Write(file_out: str,
               data: bytes) -> None:
-        """Write file.
+        """
+        Write file.
 
         Args:
             file_out: Output file path

@@ -28,7 +28,8 @@ class Utils:
     @staticmethod
     def Decode(data: Union[str, bytes],
                encoding: str = "utf-8") -> str:
-        """Decode data to specified encoding.
+        """
+        Decode data to specified encoding.
 
         Args:
             data: Data to decode
@@ -49,7 +50,8 @@ class Utils:
     @staticmethod
     def Encode(data: Union[str, bytes],
                encoding: str = "utf-8") -> bytes:
-        """Encode data to specified encoding.
+        """
+        Encode data to specified encoding.
 
         Args:
             data: Data to encode
@@ -69,7 +71,8 @@ class Utils:
 
     @staticmethod
     def DataToString(data: Union[str, bytes]) -> str:
-        """Convert data to string.
+        """
+        Convert data to string.
 
         Args:
             data: Data to convert
@@ -88,7 +91,8 @@ class Utils:
 
     @staticmethod
     def BytesToHexStr(data: bytes) -> str:
-        """Convert bytes to hex string.
+        """
+        Convert bytes to hex string.
 
         Args:
             data: Bytes to convert

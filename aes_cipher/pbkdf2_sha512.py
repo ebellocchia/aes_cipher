@@ -35,7 +35,8 @@ class Pbkdf2Sha512(IKeyDerivator):
 
     def __init__(self,
                  itr_num: int) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             itr_num: Number of iterations
@@ -50,7 +51,8 @@ class Pbkdf2Sha512(IKeyDerivator):
     def DeriveKey(self,
                   password: Union[str, bytes],
                   salt: Union[str, bytes]) -> bytes:
-        """Derive key.
+        """
+        Derive key.
 
         Args:
             password: Password for key derivation

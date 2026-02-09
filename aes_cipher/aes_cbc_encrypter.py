@@ -36,7 +36,8 @@ class AesCbcEncrypter:
     def __init__(self,
                  key: Union[str, bytes],
                  iv: Union[str, bytes]) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             key: Encryption key
@@ -46,7 +47,8 @@ class AesCbcEncrypter:
         self.aes = AES.new(Utils.Encode(key), AES.MODE_CBC, iv=Utils.Encode(iv))
 
     def Encrypt(self, data: Union[str, bytes]) -> None:
-        """Encrypt data.
+        """
+        Encrypt data.
 
         Args:
             data: Data to encrypt
@@ -54,7 +56,8 @@ class AesCbcEncrypter:
         self.encrypted_data = self.aes.encrypt(self.Pad(data))
 
     def GetEncryptedData(self) -> bytes:
-        """Get encrypted data.
+        """
+        Get encrypted data.
 
         Returns:
             Encrypted data
@@ -63,7 +66,8 @@ class AesCbcEncrypter:
 
     @staticmethod
     def Pad(data: Union[str, bytes]) -> bytes:
-        """Pad data.
+        """
+        Pad data.
 
         Args:
             data: Data to pad

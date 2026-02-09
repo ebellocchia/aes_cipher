@@ -31,7 +31,8 @@ class LoggableBase:
         self.logger = Logger()
 
     def Logger(self) -> Logger:
-        """Get logger.
+        """
+        Get logger.
 
         Returns:
             Logger instance

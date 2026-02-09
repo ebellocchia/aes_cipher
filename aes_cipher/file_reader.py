@@ -24,7 +24,8 @@ class FileReader:
 
     @staticmethod
     def Read(file_in: str) -> bytes:
-        """Read file.
+        """
+        Read file.
 
         Args:
             file_in: Input file path

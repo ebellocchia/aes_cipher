@@ -32,7 +32,8 @@ class HmacSha256:
 
     def __init__(self,
                  key: Union[str, bytes]) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             key: HMAC key
@@ -41,7 +42,8 @@ class HmacSha256:
 
     def Update(self,
                data: Union[str, bytes]) -> None:
-        """Update HMAC.
+        """
+        Update HMAC.
 
         Args:
             data: Data to update HMAC with
@@ -50,7 +52,8 @@ class HmacSha256:
 
     def Verify(self,
                hmac_tbv: bytes) -> bool:
-        """Verify HMAC.
+        """
+        Verify HMAC.
 
         Args:
             hmac_tbv: HMAC to be verified
@@ -67,7 +70,8 @@ class HmacSha256:
         return res
 
     def GetDigest(self) -> bytes:
-        """Get digest.
+        """
+        Get digest.
 
         Returns:
             HMAC digest
@@ -77,7 +81,8 @@ class HmacSha256:
     @staticmethod
     def QuickDigest(key: Union[str, bytes],
                     data: Union[str, bytes]) -> bytes:
-        """Quick compute HMAC digest.
+        """
+        Quick compute HMAC digest.
 
         Args:
             key: HMAC key
@@ -95,7 +100,8 @@ class HmacSha256:
     def QuickVerify(key: Union[str, bytes],
                     data: Union[str, bytes],
                     hmac_tbv: bytes) -> bool:
-        """Quick verify HMAC digest.
+        """
+        Quick verify HMAC digest.
 
         Args:
             key: HMAC key
@@ -111,7 +117,8 @@ class HmacSha256:
 
     @staticmethod
     def DigestSize() -> int:
-        """Get digest size.
+        """
+        Get digest size.
 
         Returns:
             Digest size in bytes

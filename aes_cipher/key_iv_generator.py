@@ -44,7 +44,8 @@ class KeyIvGenerator:
 
     def __init__(self,
                  key_derivator: IKeyDerivator) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             key_derivator: Key derivator instance
@@ -59,7 +60,8 @@ class KeyIvGenerator:
     def GenerateMaster(self,
                        password: Union[str, bytes],
                        salt: Optional[Union[str, bytes]] = None) -> None:
-        """Generate master key and IV from password.
+        """
+        Generate master key and IV from password.
 
         Args:
             password: Password for key derivation
@@ -77,7 +79,8 @@ class KeyIvGenerator:
         self.internal_iv = os.urandom(AesConst.IvSize())
 
     def GetMasterKey(self) -> bytes:
-        """Get master key.
+        """
+        Get master key.
 
         Returns:
             Master key
@@ -85,7 +88,8 @@ class KeyIvGenerator:
         return self.master_key
 
     def GetMasterIV(self) -> bytes:
-        """Get master IV.
+        """
+        Get master IV.
 
         Returns:
             Master IV
@@ -93,7 +97,8 @@ class KeyIvGenerator:
         return self.master_iv
 
     def GetInternalKey(self) -> bytes:
-        """Get internal key.
+        """
+        Get internal key.
 
         Returns:
             Internal key
@@ -101,7 +106,8 @@ class KeyIvGenerator:
         return self.internal_key
 
     def GetInternalIV(self) -> bytes:
-        """Get internal IV.
+        """
+        Get internal IV.
 
         Returns:
             Internal IV
@@ -109,7 +115,8 @@ class KeyIvGenerator:
         return self.internal_iv
 
     def GetSalt(self) -> bytes:
-        """Get salt.
+        """
+        Get salt.
 
         Returns:
             Salt

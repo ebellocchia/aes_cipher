@@ -30,7 +30,8 @@ class SaltLength:
 
     @staticmethod
     def EncodedLengthSize() -> int:
-        """Get encoded length size.
+        """
+        Get encoded length size.
 
         Returns:
             Encoded length size in bytes
@@ -39,7 +40,8 @@ class SaltLength:
 
     @staticmethod
     def DecodeLength(salt_len_bytes: bytes) -> int:
-        """Decode length.
+        """
+        Decode length.
 
         Args:
             salt_len_bytes: Salt length bytes
@@ -51,7 +53,8 @@ class SaltLength:
 
     @staticmethod
     def EncodeLength(salt: bytes) -> bytes:
-        """Encode length.
+        """
+        Encode length.
 
         Args:
             salt: Salt bytes

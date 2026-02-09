@@ -39,7 +39,8 @@ class DataEncrypter(LoggableBase):
 
     def __init__(self,
                  key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             key_derivator: Key derivator instance
@@ -52,7 +53,8 @@ class DataEncrypter(LoggableBase):
                 data: Union[str, bytes],
                 passwords: List[Union[str, bytes]],
                 salts: Optional[List[Union[str, bytes]]] = None) -> None:
-        """Encrypt.
+        """
+        Encrypt.
 
         Args:
             data: Data to encrypt
@@ -104,7 +106,8 @@ class DataEncrypter(LoggableBase):
         self.encrypted_data = curr_data
 
     def GetEncryptedData(self) -> bytes:
-        """Get encrypted data.
+        """
+        Get encrypted data.
 
         Returns:
             Encrypted data
@@ -113,7 +116,8 @@ class DataEncrypter(LoggableBase):
 
     def __ProcessSalt(self,
                       key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
-        """Process salt.
+        """
+        Process salt.
 
         Args:
             key_iv_gen: Key/IV generator instance
@@ -130,7 +134,8 @@ class DataEncrypter(LoggableBase):
 
     def __EncryptInternalKeyIv(self,
                                key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
-        """Encrypt internal key and IV.
+        """
+        Encrypt internal key and IV.
 
         Args:
             key_iv_gen: Key/IV generator instance
@@ -153,7 +158,8 @@ class DataEncrypter(LoggableBase):
     def __EncryptData(self,
                       data: Union[str, bytes],
                       key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
-        """Encrypt data.
+        """
+        Encrypt data.
 
         Args:
             data: Data to encrypt

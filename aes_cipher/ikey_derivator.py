@@ -29,7 +29,8 @@ class IKeyDerivator(ABC):
     def DeriveKey(self,
                   password: Union[str, bytes],
                   salt: Union[str, bytes]) -> bytes:
-        """Derive key. Output shall be at least 48-byte long.
+        """
+        Derive key. Output shall be at least 48-byte long.
 
         Args:
             password: Password for key derivation

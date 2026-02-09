@@ -35,7 +35,8 @@ class FileEncrypter:
 
     def __init__(self,
                  key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             key_derivator: Key derivator instance
@@ -43,7 +44,8 @@ class FileEncrypter:
         self.encrypter = DataEncrypter(key_derivator)
 
     def Logger(self) -> Logger:
-        """Get logger.
+        """
+        Get logger.
 
         Returns:
             Logger instance
@@ -54,7 +56,8 @@ class FileEncrypter:
                 file_in: str,
                 passwords: List[Union[str, bytes]],
                 salts: Optional[List[Union[str, bytes]]] = None) -> None:
-        """Encrypt.
+        """
+        Encrypt.
 
         Args:
             file_in: Input file path
@@ -65,7 +68,8 @@ class FileEncrypter:
         self.encrypter.Encrypt(file_data, passwords, salts)
 
     def GetEncryptedData(self) -> bytes:
-        """Get encrypted data.
+        """
+        Get encrypted data.
 
         Returns:
             Encrypted data
@@ -74,7 +78,8 @@ class FileEncrypter:
 
     def SaveTo(self,
                file_out: str) -> None:
-        """Save to file.
+        """
+        Save to file.
 
         Args:
             file_out: Output file path

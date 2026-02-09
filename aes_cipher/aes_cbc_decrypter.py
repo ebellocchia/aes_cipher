@@ -36,7 +36,8 @@ class AesCbcDecrypter:
     def __init__(self,
                  key: Union[str, bytes],
                  iv: Union[str, bytes]) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             key: Decryption key
@@ -46,7 +47,8 @@ class AesCbcDecrypter:
         self.aes = AES.new(Utils.Encode(key), AES.MODE_CBC, iv=Utils.Encode(iv))
 
     def Decrypt(self, data: bytes) -> None:
-        """Decrypt data.
+        """
+        Decrypt data.
 
         Args:
             data: Data to decrypt
@@ -54,7 +56,8 @@ class AesCbcDecrypter:
         self.decrypted_data = self.UnPad(self.aes.decrypt(data))
 
     def GetDecryptedData(self) -> bytes:
-        """Get decrypted data.
+        """
+        Get decrypted data.
 
         Returns:
             Decrypted data
@@ -63,7 +66,8 @@ class AesCbcDecrypter:
 
     @staticmethod
     def UnPad(data: bytes) -> bytes:
-        """Unpad data.
+        """
+        Unpad data.
 
         Args:
             data: Data to unpad

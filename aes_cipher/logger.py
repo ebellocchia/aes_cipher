@@ -40,7 +40,8 @@ class Logger:
 
     def SetLevel(self,
                  level: int) -> None:
-        """Set level.
+        """
+        Set level.
 
         Args:
             level: Logging level
@@ -48,7 +49,8 @@ class Logger:
         self.logger.setLevel(level)
 
     def GetLogger(self) -> logging.Logger:
-        """Get logger.
+        """
+        Get logger.
 
         Returns:
             Logger instance

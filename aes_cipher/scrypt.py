@@ -38,7 +38,8 @@ class Scrypt(IKeyDerivator):
                  n: int,
                  r: int,
                  p: int) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             n: CPU/memory cost parameter
@@ -57,7 +58,8 @@ class Scrypt(IKeyDerivator):
     def DeriveKey(self,
                   password: Union[str, bytes],
                   salt: Union[str, bytes]) -> bytes:
-        """Derive key.
+        """
+        Derive key.
 
         Args:
             password: Password for key derivation

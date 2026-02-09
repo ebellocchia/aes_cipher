@@ -55,7 +55,8 @@ class DataDecrypter(LoggableBase):
 
     def __init__(self,
                  key_derivator: IKeyDerivator = Pbkdf2Sha512Default) -> None:
-        """Constructor.
+        """
+        Constructor.
 
         Args:
             key_derivator: Key derivator instance
@@ -67,7 +68,8 @@ class DataDecrypter(LoggableBase):
     def Decrypt(self,
                 data: bytes,
                 passwords: List[Union[str, bytes]]) -> None:
-        """Decrypt.
+        """
+        Decrypt.
 
         Args:
             data: Data to decrypt
@@ -107,7 +109,8 @@ class DataDecrypter(LoggableBase):
         self.decrypted_data = curr_data
 
     def GetDecryptedData(self) -> bytes:
-        """Get decrypted data.
+        """
+        Get decrypted data.
 
         Returns:
             Decrypted data
@@ -116,7 +119,8 @@ class DataDecrypter(LoggableBase):
 
     def __ReadSalt(self,
                    data: bytes) -> bytes:
-        """Read salt.
+        """
+        Read salt.
 
         Args:
             data: Data to read salt from
@@ -134,7 +138,8 @@ class DataDecrypter(LoggableBase):
     def __ReadInternalKeyIv(self,
                             data: bytes,
                             key_iv_gen: KeyIvGenerator) -> Tuple[bytes, bytes]:
-        """Read internal key and IV.
+        """
+        Read internal key and IV.
 
         Args:
             data: Data to read from
@@ -167,7 +172,8 @@ class DataDecrypter(LoggableBase):
                    data: bytes,
                    internal_key: bytes,
                    internal_iv: bytes) -> bytes:
-        """Read data.
+        """
+        Read data.
 
         Args:
             data: Data to read from

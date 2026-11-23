@@ -1,3 +1,7 @@
+# 2.1.0
+
+- Add Python 3.14 support
+
 # 2.0.1
 
 - Update Python versions

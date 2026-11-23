@@ -45,6 +45,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -142,7 +143,7 @@ convention = "google"
 max-complexity = 10
 
 [tool.mypy]
-python_version = "3.7"
+python_version = "3.10"
 ignore_missing_imports = true
 follow_imports = "skip"
 exclude = [
